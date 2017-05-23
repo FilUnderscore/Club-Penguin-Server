@@ -257,10 +257,62 @@ public class Database
 		return 0;
 	}
 	
-	public List<Integer> getClientFriendsById(int userId) throws Exception
+	public List<Integer> getClientFriendIdsById(int userId) throws Exception
 	{
-		//TODO: Convert to List<Penguin>
-		return new ArrayList<>();
+		List<Integer> friends = new ArrayList<>();
+		
+		ResultSet selfRes = this.Connection.prepareStatement("SELECT * FROM `users` WHERE id = '" + userId + "';").executeQuery();
+		
+		if(selfRes.next())
+		{
+			friends = ListUtil.toInt(selfRes.getString("friends"));
+		}
+		
+		return friends;
+	}
+	
+	public void saveClientFriends(int userId, List<Integer> friends) throws Exception
+	{
+		this.Connection.prepareStatement("UPDATE `users` SET friends = '" + ListUtil.toString(friends) + "' WHERE id = '" + userId + "';");
+	}
+
+	public List<Integer> getOnlineClientFriendsById(int clientId) throws Exception
+	{
+		List<Integer> friends = new ArrayList<>();
+		
+		ResultSet selfRes = this.Connection.prepareStatement("SELECT * FROM `users` WHERE id = '" + clientId + "';").executeQuery();
+		
+		if(selfRes.next())
+		{
+			for(int friendId : getClientFriendIdsById(clientId))
+			{
+				ResultSet friendRes = this.Connection.prepareStatement("SELECT * FROM `users` WHERE id = '" + friendId + "';").executeQuery();
+				
+				if(friendRes.next())
+				{
+					if(friendRes.getBoolean("online"))
+					{
+						friends.add(friendId);
+					}
+				}
+				
+				friendRes.close();
+			}
+		}
+		
+		selfRes.close();
+		
+		return friends;
+	}
+	
+	public void logChatMessage(int userId, String msg) throws Exception
+	{
+		this.Connection.prepareStatement("INSERT INTO `chathistory` (id,text) VALUES ('" + userId + "','" + msg + "');").executeUpdate();
+	}
+	
+	public void updateOnlineStatus(int userId, boolean online) throws Exception
+	{
+		this.Connection.prepareStatement("UPDATE `users` SET online = '" + (online ? "1" : "0") + "' WHERE id = '" + userId + "';").executeUpdate();
 	}
 	
 	public ResultSet getUserDetails(int userId) throws Exception

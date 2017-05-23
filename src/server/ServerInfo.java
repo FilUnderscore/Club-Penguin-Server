@@ -39,6 +39,7 @@ public class ServerInfo
 
 	public ServerInfo(int id, String address, int port)
 	{
+		this.Name = "SERVER";
 		this.Id = id;
 		this.Address = address;
 		this.Port = port;

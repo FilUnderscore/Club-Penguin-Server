@@ -17,6 +17,8 @@ public class Game extends Server
 		super(info);
 		
 		this.IglooMap = new ArrayList<>();
+		
+		save();
 	}
 	
 	public List<Penguin> getIglooMap()
@@ -79,22 +81,25 @@ public class Game extends Server
 		this.Clients.remove(client);
 		
 		client = null;
+		
+		save();
 	}
 	
 	@SuppressWarnings("deprecation")
 	public void stop() throws Exception
 	{
-		this.Database.removeServer(this.ServerInfo.Id);
+		remove();
 		
 		for(Penguin client : this.Clients)
 		{
-			client.sendError(1);
+			client.kickStop();
 		}
 		
 		this.Clients.clear();
 		
 		this.Threads.shutdownNow();
 		
-		this.ServerThread.stop();
+		if(this.ServerThread != null)
+			this.ServerThread.stop();
 	}
 }

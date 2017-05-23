@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -86,14 +87,7 @@ public abstract class Server
 		
 		this.ServerInfo.setPopulation(this.Clients.size());
 		
-		try
-		{
-			this.Database.saveServer(this.ServerInfo);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+		save();
 		
 		while(true)
 		{
@@ -108,7 +102,7 @@ public abstract class Server
 				{
 					handleData(data, client);
 				}
-				else if(read <= 0 && Time.exceeded(0, 0))
+				else if(read == -1)
 				{
 					onDisconnect(client);
 					break;
@@ -120,6 +114,36 @@ public abstract class Server
 				Logger.error("There was an error while reading data from a Socket: " + e.getMessage(), this);
 				onDisconnect(client);
 				break;
+			}
+		}
+	}
+	
+	public final void save()
+	{
+		if(this.ServerInfo.Type == ServerType.GAME)
+		{
+			try
+			{
+				this.Database.saveServer(this.ServerInfo);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public final void remove()
+	{
+		if(this.ServerInfo.Type == ServerType.GAME)
+		{
+			try
+			{
+				this.Database.removeServer(this.ServerInfo.Id);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
 			}
 		}
 	}
@@ -203,10 +227,6 @@ public abstract class Server
 				}
 			}
 		}
-		else
-		{
-			System.out.println("Not Sys: " + element.getAttributeValue("t"));
-		}
 	}
 	
 	public void handleXTData(String packet, Penguin client)
@@ -215,9 +235,12 @@ public abstract class Server
 		
 		String cmd = cmds[3];
 		
+		/**
+		 * Update Clothing Prefix
+		 */
 		if(cmd.contains("s#up"))
 		{
-			client.sendUpdate(cmd.split("#")[1], Integer.parseInt(cmds[4]), Integer.parseInt(cmds[5]));
+			client.sendClothingUpdate(cmd.split("#")[1], Integer.parseInt(cmds[4]), Integer.parseInt(cmds[5]));
 			return;
 		}
 		
@@ -236,35 +259,53 @@ public abstract class Server
 		case "j#grs": //Get Room Synchronized
 			break;
 		case "u#gp": //Get Player
-			client.sendData("%xt%gp%1%" + client.Id + "|" + client.Username + "|" + client.MembershipStatus + "|" + client.Color + "|" + client.Head + "|" + client.Face + "|" + client.Neck + "|" + client.Body + "|" + client.Hands + "|" + client.Feet + "|" + client.Flag + "|" + client.Photo + "%");
+			int id = Integer.parseInt(cmds[5]);
+			
+			Penguin player;
+			
+			if(id == client.Id)
+			{
+				player = client;
+			}
+			else
+			{
+				player = Penguin.loadPenguin(id, this);
+			}
+			
+			String str = "%xt%gp%" + cmds[4] + "%" + player.Id + "|" + player.Username + "|" + player.MembershipStatus + "|" + player.Color + "|" + player.Head + "|" + player.Face + "|" + player.Neck + "|" + player.Body + "|" + player.Hands + "|" + player.Feet + "|" + player.Flag + "|" + player.Photo + "%";
+			
+			client.sendData(str);
 			break;
 		case "i#gi": //Get Inventory
 			client.sendData("%xt%gps%-1%" + client.Id + "%9|10|11|14|20|183%");
 			client.sendData("%xt%glr%-1%3555%"); //Revision?
-			client.sendData("%xt%lp%-1%" + client.getClientString() + "%" + client.Coins + "%" + (client.SafeMode ? "1" : "0") + "%" + client.SafeModeEggTimerMins + "%" + (System.currentTimeMillis() / 1000L) + "%" + client.Age + "%" + client.BannedAge + "%" + client.MinsPlayed + "%" + client.MembershipDaysLeft + "%");
+			client.sendData("%xt%lp%-1%" + client.getClientString() + "%" + client.Coins + "%" + (client.SafeMode ? "1" : "0") + (client.SafeMode ? ("%" + client.SafeModeEggTimerMins) : "") + "%" + (client.MembershipDaysLeft > 0 ? client.MembershipDaysLeft : "") + "%" + (System.currentTimeMillis() / 1000L) + "%" + client.Age + "%" + client.BannedAge + "%" + client.MinsPlayed + "%");
 			client.sendData("%xt%gi%-1" + client.getInventoryString());
 			client.joinRoom(100, 330, 330);
 			break;
 		case "i#ai": //Add Item
-			int cost = 0;
-			
-			if(cmds.length == 7)
-			{
-				cost = Integer.parseInt(cmds[6]);
-			}
-			
-			client.addItem(Integer.parseInt(cmds[4]), Integer.parseInt(cmds[5]), cost);
+			client.addItem(Integer.parseInt(cmds[4]), Integer.parseInt(cmds[5]));
 			break;
 		case "u#h": //Keep Alive
 			client.sendData("%xt%h%" + cmds[4] + "%");
 			break;
-		case "u#sf": //Set Frame
+		case "u#sa": //Send Action
+			client.sendActionUpdate(Integer.parseInt(cmds[4]), Integer.parseInt(cmds[5]));
+			break;
+		case "u#sf": //Send Frame
 			client.sendFrameUpdate(Integer.parseInt(cmds[4]), Integer.parseInt(cmds[5]));
 			break;
 		case "m#sm": //Send Message
 			client.sendMessage(Integer.parseInt(cmds[4]), cmds[6]);
 			break;
+		case "b#gb": //Get Buddy List
+			client.sendData("%xt%gb%" + cmds[4] + client.getBuddyString());
+			break;
+		case "n#gi": //Get Ignore List
+			break;
 		case "f#epfgf": //Get Field-Op (EPF)
+			break;
+		case "ni#gnr": //Get Ninja Revision
 			break;
 		default:
 			//client.sendError(10005);
@@ -372,7 +413,29 @@ public abstract class Server
 			
 			//%   xt  % l  % -1 %   1    % abcd... %    0    %      0      %
 			//protocol,type,rmid,clientid,loginKey,friends(|),worldpopulation(|)
-			client.sendData("%xt%l%-1%" + clientId + "%" + loginKey + "%0%");
+			
+			String friends = "";
+			
+			try
+			{
+				List<Integer> friendData = this.Database.getOnlineClientFriendsById(clientId);
+				
+				if(friendData.size() > 0)
+				{
+					friends += friendData.get(0);
+					
+					for(int i = 1; i < friendData.size(); i++)
+					{
+						friends += "|" + friendData.get(i);
+					}
+				}
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			
+			client.sendData("%xt%l%-1%" + clientId + "%" + loginKey + "%" + friends + "%");
 			
 			client.Id = clientId;
 			client.LoginKey = loginKey;

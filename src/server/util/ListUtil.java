@@ -9,11 +9,14 @@ public class ListUtil
 	{
 		String str = "";
 		
-		str += list.get(0).toString();
-		
-		for(int i = 1; i < list.size(); i++)
+		if(list.size() > 0)
 		{
-			str += "," + list.get(i).toString();
+			str += list.get(0).toString();
+			
+			for(int i = 1; i < list.size(); i++)
+			{
+				str += "," + list.get(i).toString();
+			}
 		}
 		
 		return str;

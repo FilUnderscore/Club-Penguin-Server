@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.json.JSONObject;
+
 import server.Server;
 import server.util.Logger;
 
@@ -18,8 +22,8 @@ public class Penguin
 	public String Username;
 	
 	//Auth
-	public String RandomKey = "POJ|oCk[dJsEKuja"; //Used to hash passwords with, generated on registration?
-	public String LoginKey;
+	public String RandomKey; //Used to hash passwords (Client/Server MD5-Swap)
+	public String LoginKey; //Used to authenticate with Login (Client/Server MD5-Swap)
 
 	public int Coins;
 	
@@ -59,6 +63,11 @@ public class Penguin
 	public int Frame;
 	
 	/**
+	 * Current Animation in SWF
+	 */
+	public int Action;
+	
+	/**
 	 * Igloo Type (id)
 	 */
 	public int Igloo;
@@ -81,9 +90,9 @@ public class Penguin
 	
 	public ArrayList<Integer> OwnedIgloos;
 	
-	public HashSet<Integer> Friends;
+	public List<Integer> Friends;
 	
-	public HashSet<Integer> Ignored;
+	public List<Integer> Ignored;
 	
 	public ArrayList<Integer> Stamps;
 	
@@ -94,18 +103,22 @@ public class Penguin
 	/**
 	 * Parental Controls
 	 */
-	public boolean SafeMode;
-	public int SafeModeEggTimerMins;
+	public boolean SafeMode = false;
+	public int SafeModeEggTimerMins = 1440;
 	
 	/**
 	 * Age (in days since registration)
 	 */
-	public int Age;
-	public int BannedAge;
+	public int Age = 10;
+	public int BannedAge = 4;
 	
-	public int MinsPlayed;
+	public int MinsPlayed = 1000;
 	
-	public int MembershipDaysLeft = 7;
+	public int MembershipDaysLeft = 1440;
+	
+	protected Penguin()
+	{
+	}
 	
 	public Penguin(Socket socket, Server server)
 	{
@@ -115,6 +128,11 @@ public class Penguin
 	
 	public void sendData(String data)
 	{
+		if(this.Socket == null)
+		{
+			return; //No point in sending Data to non-existant client
+		}
+		
 		data += '\u0000';
 		
 		Logger.notice("Sending data: " + data, this.Server);
@@ -152,6 +170,27 @@ public class Penguin
 		sendData("%xt%e%-1%" + i + "%");
 	}
 	
+	public static Penguin loadPenguin(int userId, Server server)
+	{
+		try
+		{
+			Penguin penguin = new Penguin();
+			
+			penguin.Id = userId;
+			penguin.Server = server;
+			
+			penguin.loadPenguin();
+			
+			return penguin;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
 	/**
 	 * Load Client Information.
 	 */
@@ -166,6 +205,13 @@ public class Penguin
 				this.Username = data.getString("nickname");
 				this.Color = data.getInt("color");
 				this.Coins = data.getInt("coins");
+				
+				this.Age = Days.daysBetween(new DateTime(data.getTimestamp("joindate").getTime()), new DateTime()).getDays();
+				
+				JSONObject membership = new JSONObject(data.getString("membership"));
+				
+				this.MembershipStatus = membership.getInt("status");
+				this.MembershipDaysLeft = membership.getInt("daysLeft");
 				
 				List<Integer> clothes = this.Server.getDatabase().getPenguinClothesById(this.Id);
 				
@@ -214,7 +260,7 @@ public class Penguin
 	{
 		boolean enabled = true;
 		
-		return this.Id + "|" + this.Username + "|" + (enabled ? "1" : "0") + "|" + this.Color + "|" + this.Head + "|" + this.Face + "|" + this.Neck + "|" + this.Body + "|" + this.Hands + "|" + this.Feet + "|" + this.Flag + "|" + this.Photo + "|" + this.X + "|" + this.Y + "|" + this.Frame + "|1|" + this.MembershipStatus * 146;
+		return this.Id + "|" + this.Username + "|" + (enabled ? "1" : "0") + "|" + this.Color + "|" + this.Head + "|" + this.Face + "|" + this.Neck + "|" + this.Body + "|" + this.Hands + "|" + this.Feet + "|" + this.Flag + "|" + this.Photo + "|" + this.X + "|" + this.Y + "|" + this.Frame + "|" + this.MembershipStatus + "|" + this.MembershipStatus * 146;
 	}
 	
 	public String getRoomString()
@@ -246,7 +292,7 @@ public class Penguin
 			this.Y = y;
 			this.sendData("%xt%jx%-1%" + roomID + "%");
 			this.sendData("%xt%jr%-1%" + roomID + "%" + this.getClientString() + "%" + this.getRoomString());
-			this.Server.sendData("%xt%ap%-1%" + this.getClientString() + "%", this);
+			this.sendRoom("%xt%ap%-1%" + this.getClientString() + "%");
 			return;
 		}
 		
@@ -259,16 +305,30 @@ public class Penguin
 		this.X = x;
 		this.Y = y;
 		
-		this.Server.sendData("%xt%sp%" + roomID + "%" + this.Id + "%" + x + "%" + y + "%", this);
+		this.sendRoom("%xt%sp%" + roomID + "%" + this.Id + "%" + x + "%" + y + "%");
 	}
 	
 	public void sendMessage(int roomID, String text)
 	{
-		this.Server.sendData("%xt%sm%" + roomID + "%" + this.Id + "%" + text + "%", this);
+		try
+		{
+			this.Server.getDatabase().logChatMessage(this.Id, text);
+
+			this.sendRoom("%xt%sm%" + roomID + "%" + this.Id + "%" + text + "%");
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			
+			this.sendError(1000);
+		}
 	}
 	
-	public void addItem(int roomID, int itemId, int cost)
+	public void addItem(int roomID, int itemId)
 	{
+		//Lookup Item in Crumbs and get cost
+		int cost = 0;
+		
 		if(this.Inventory.contains(itemId))
 		{
 			this.sendError(400);
@@ -284,7 +344,7 @@ public class Penguin
 		//402: Item not available;
 		
 		this.Inventory.add(itemId);
-		this.deductCoins(cost);
+		//this.deductCoins(cost);
 		
 		try 
 		{
@@ -402,18 +462,76 @@ public class Penguin
 	public void removePlayerFromRoom()
 	{
 		this.sendData("%xt%rp%-1%" + this.Id + "%");
+		this.sendRoom("%xt%rp%-1%" + this.Id + "%");
+	}
+	
+	public String getBuddyString()
+	{
+		try
+		{
+			String str = "%";
+			
+			List<Integer> online = this.Server.getDatabase().getOnlineClientFriendsById(this.Id);
+			
+			for(int friendId : this.Friends)
+			{
+				ResultSet res = this.Server.getDatabase().getUserDetails(friendId);
+				
+				if(res.next())
+				{
+					String name = res.getString("nickname");
+					
+					str += friendId + "|" + name + "|" + (online.contains(friendId) ? "1" : "0") + "%";
+				}
+			}
+			
+			return str;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return "%";
 	}
 	
 	public void handleBuddyOnline()
 	{
+		try
+		{
+			this.Server.getDatabase().updateOnlineStatus(this.Id, true);
+		
+			this.Friends = this.Server.getDatabase().getClientFriendIdsById(this.Id);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
 		//TODO
 		//see https://github.com/titshacking/RBSE/blob/master/Core/CPUser.rb handleBuddyOnline
 	}
 	
 	public void handleBuddyOffline()
 	{
+		try
+		{
+			this.Server.getDatabase().updateOnlineStatus(this.Id, false);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
 		//TODO
 		//see https://github.com/titshacking/RBSE/blob/master/Core/CPUser.rb handleBuddyOffline
+	}
+	
+	public void kickStop()
+	{
+		this.sendError(1);
+	
+		this.handleBuddyOffline();
 	}
 	
 	public Socket getSocket()
@@ -437,10 +555,17 @@ public class Penguin
 	{
 		this.Frame = frameID;
 		
-		this.Server.sendData("%xt%sf%" + roomID + "%" + this.Id + "%" + frameID, this);
+		this.sendRoom("%xt%sf%" + roomID + "%" + this.Id + "%" + frameID + "%");
 	}
 	
-	public void sendUpdate(String sub, int roomID, int itemID)
+	public void sendActionUpdate(int roomID, int actionID)
+	{
+		this.Action = actionID;
+		
+		this.sendRoom("%xt%sa%" + roomID + "%" + this.Id + "%" + actionID + "%");
+	}
+	
+	public void sendClothingUpdate(String sub, int roomID, int itemID)
 	{
 		String str = "%xt%" + sub + "%" + roomID + "%" + this.Id + "%" + itemID + "%";
 		
@@ -496,6 +621,6 @@ public class Penguin
 		}
 		
 		this.sendData(str);
-		this.Server.sendData(str, this);
+		this.sendRoom(str);
 	}
 }
