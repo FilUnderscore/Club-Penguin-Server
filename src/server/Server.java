@@ -7,18 +7,19 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
+import server.event.EventManager;
+import server.events.ActionEvent;
+import server.events.PolicyFileRequestEvent;
 import server.player.Penguin;
 import server.player.StaffRank;
 import server.util.Crypto;
 import server.util.Logger;
-import server.util.Time;
 
 public abstract class Server 
 {
@@ -32,12 +33,18 @@ public abstract class Server
 	
 	protected ExecutorService Threads;
 	
+	protected EventManager EventManager;
+	
 	protected List<Penguin> Clients;
 	
 	public Server(ServerInfo info)
 	{
 		this.ServerInfo = info;
-	
+		
+		this.EventManager = new EventManager(this);
+		registerEvents();
+		this.EventManager.init();
+		
 		if(this instanceof Game)
 		{
 			this.ServerInfo.Type = ServerType.GAME;
@@ -148,6 +155,8 @@ public abstract class Server
 		}
 	}
 	
+	public abstract void registerEvents();
+	
 	public abstract void onDisconnect(Penguin client);
 	
 	public void handleData(byte[] dataArr, Penguin client) throws Exception
@@ -159,19 +168,7 @@ public abstract class Server
 		for(String packet : packets)
 		{
 			Logger.info("Incoming Data: " + packet, this);
-			String packetType = packet.substring(0, 1);
-			switch(packetType)
-			{
-			case "<":
-				handleXMLData(packet, client);
-				break;
-			case "%":
-				handleXTData(packet, client);
-				break;
-			default:
-				onDisconnect(client);
-				break;
-			}
+			this.EventManager.handleEvents(client, packet);
 		}
 	}
 	
@@ -235,71 +232,9 @@ public abstract class Server
 		
 		String cmd = cmds[3];
 		
-		/**
-		 * Update Clothing Prefix
-		 */
-		if(cmd.contains("s#up"))
-		{
-			client.sendClothingUpdate(cmd.split("#")[1], Integer.parseInt(cmds[4]), Integer.parseInt(cmds[5]));
-			return;
-		}
-		
 		switch(cmd)
 		{
-		case "j#js": //Join Server
-			client.sendData("%xt%js%-1%" + client.Id + "%" + (client.IsEPF ? "1" : "0") + "%" + (client.Ranking == StaffRank.MODERATOR ? "1" : "0") + "%0%");
-			//client.sendData("%xt%lp%-1%" + client.getClientString() + "%" + client.Coins + "%0%1440%100%1%4%1%7");
-			break;
-		case "j#jr": //Join Room
-			client.joinRoom(Integer.parseInt(cmds[5]), Integer.parseInt(cmds[6]), Integer.parseInt(cmds[7]));
-			break;
-		case "u#sp": //Set Player Position
-			client.move(Integer.parseInt(cmds[4]), Integer.parseInt(cmds[5]), Integer.parseInt(cmds[6]));
-			break;
 		case "j#grs": //Get Room Synchronized
-			break;
-		case "u#gp": //Get Player
-			int id = Integer.parseInt(cmds[5]);
-			
-			Penguin player;
-			
-			if(id == client.Id)
-			{
-				player = client;
-			}
-			else
-			{
-				player = Penguin.loadPenguin(id, this);
-			}
-			
-			String str = "%xt%gp%" + cmds[4] + "%" + player.Id + "|" + player.Username + "|" + player.MembershipStatus + "|" + player.Color + "|" + player.Head + "|" + player.Face + "|" + player.Neck + "|" + player.Body + "|" + player.Hands + "|" + player.Feet + "|" + player.Flag + "|" + player.Photo + "%";
-			
-			client.sendData(str);
-			break;
-		case "i#gi": //Get Inventory
-			client.sendData("%xt%gps%-1%" + client.Id + "%9|10|11|14|20|183%");
-			client.sendData("%xt%glr%-1%3555%"); //Revision?
-			client.sendData("%xt%lp%-1%" + client.getClientString() + "%" + client.Coins + "%" + (client.SafeMode ? "1" : "0") + (client.SafeMode ? ("%" + client.SafeModeEggTimerMins) : "") + "%" + (client.MembershipDaysLeft > 0 ? client.MembershipDaysLeft : "") + "%" + (System.currentTimeMillis() / 1000L) + "%" + client.Age + "%" + client.BannedAge + "%" + client.MinsPlayed + "%");
-			client.sendData("%xt%gi%-1" + client.getInventoryString());
-			client.joinRoom(100, 330, 330);
-			break;
-		case "i#ai": //Add Item
-			client.addItem(Integer.parseInt(cmds[4]), Integer.parseInt(cmds[5]));
-			break;
-		case "u#h": //Keep Alive
-			client.sendData("%xt%h%" + cmds[4] + "%");
-			break;
-		case "u#sa": //Send Action
-			client.sendActionUpdate(Integer.parseInt(cmds[4]), Integer.parseInt(cmds[5]));
-			break;
-		case "u#sf": //Send Frame
-			client.sendFrameUpdate(Integer.parseInt(cmds[4]), Integer.parseInt(cmds[5]));
-			break;
-		case "m#sm": //Send Message
-			client.sendMessage(Integer.parseInt(cmds[4]), cmds[6]);
-			break;
-		case "b#gb": //Get Buddy List
-			client.sendData("%xt%gb%" + cmds[4] + client.getBuddyString());
 			break;
 		case "n#gi": //Get Ignore List
 			break;

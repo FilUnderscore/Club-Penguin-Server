@@ -11,6 +11,7 @@ import org.joda.time.Days;
 import org.json.JSONObject;
 
 import server.Server;
+import server.ServerType;
 import server.util.Logger;
 
 public class Penguin 
@@ -128,11 +129,6 @@ public class Penguin
 	
 	public void sendData(String data)
 	{
-		if(this.Socket == null)
-		{
-			return; //No point in sending Data to non-existant client
-		}
-		
 		data += '\u0000';
 		
 		Logger.notice("Sending data: " + data, this.Server);
@@ -144,7 +140,7 @@ public class Penguin
 		}
 		catch(Exception e)
 		{
-			//Error while sending data to SWF Client.
+			//Error while sending data to SWF Client.e
 			e.printStackTrace();
 		}
 	}
@@ -272,7 +268,7 @@ public class Penguin
 		{
 			if(client.Room == this.Room && client.Id != this.Id)
 			{
-				roomString += client.getClientString() + "%";
+				roomString += "%" + client.getClientString();
 			}
 		}
 		
@@ -290,9 +286,15 @@ public class Penguin
 			this.Room = roomID;
 			this.X = x;
 			this.Y = y;
-			this.sendData("%xt%jx%-1%" + roomID + "%");
-			this.sendData("%xt%jr%-1%" + roomID + "%" + this.getClientString() + "%" + this.getRoomString());
-			this.sendRoom("%xt%ap%-1%" + this.getClientString() + "%");
+			
+			//this.sendData("%xt%jx%-1%" + roomID + "%");
+			//this.sendData("%xt%jr%-1%" + roomID + "%" + this.getClientString() + "%" + this.getRoomString());
+			//this.sendData("%xt%ap%-1%" + this.getClientString() + "%");
+			
+			this.sendData(buildXTMessage("jx", -1, roomID));
+			this.sendData(buildXTMessage("jr", -1, roomID, this.getClientString() + this.getRoomString()));
+			
+			this.sendRoom(buildXTMessage("ap", -1, this.getClientString()));
 			return;
 		}
 		
@@ -305,7 +307,7 @@ public class Penguin
 		this.X = x;
 		this.Y = y;
 		
-		this.sendRoom("%xt%sp%" + roomID + "%" + this.Id + "%" + x + "%" + y + "%");
+		this.sendRoom(this.buildXTMessage("sp", roomID, this.Id, x, y));
 	}
 	
 	public void sendMessage(int roomID, String text)
@@ -314,7 +316,7 @@ public class Penguin
 		{
 			this.Server.getDatabase().logChatMessage(this.Id, text);
 
-			this.sendRoom("%xt%sm%" + roomID + "%" + this.Id + "%" + text + "%");
+			this.sendRoom(this.buildXTMessage("sm", roomID, this.Id, text));
 		}
 		catch(Exception e)
 		{
@@ -322,6 +324,33 @@ public class Penguin
 			
 			this.sendError(1000);
 		}
+	}
+	
+	public void sendJokeMessage(int roomID, int jokeID)
+	{
+		this.sendRoom(this.buildXTMessage("sj", roomID, this.Id, jokeID));
+	}
+
+	public void sendEmote(int roomID, int emoteID) 
+	{
+		this.sendRoom(this.buildXTMessage("se", roomID, this.Id, emoteID));
+	}
+	
+	public void sendSafeMessage(int roomID, int safeMsgID)
+	{
+		this.sendRoom(this.buildXTMessage("ss", roomID, this.Id, safeMsgID));
+	}
+	
+	public String buildXTMessage(String type, Object...args)
+	{
+		String str = "%xt%" + type + "%";
+		
+		for(Object arg : args)
+		{
+			str += arg + "%";
+		}
+		
+		return str;
 	}
 	
 	public void addItem(int roomID, int itemId)
@@ -344,7 +373,7 @@ public class Penguin
 		//402: Item not available;
 		
 		this.Inventory.add(itemId);
-		//this.deductCoins(cost);
+		this.deductCoins(cost);
 		
 		try 
 		{
@@ -355,7 +384,7 @@ public class Penguin
 			e.printStackTrace();
 		}
 		
-		this.sendData("%xt%ai%" + roomID + "%" + itemId + "%" + cost + "%");
+		this.sendData(this.buildXTMessage("ai", roomID, itemId, cost));
 	}
 	
 	public int getCurrentRoomCount()
@@ -461,7 +490,6 @@ public class Penguin
 	
 	public void removePlayerFromRoom()
 	{
-		this.sendData("%xt%rp%-1%" + this.Id + "%");
 		this.sendRoom("%xt%rp%-1%" + this.Id + "%");
 	}
 	
@@ -469,7 +497,7 @@ public class Penguin
 	{
 		try
 		{
-			String str = "%";
+			String str = "";
 			
 			List<Integer> online = this.Server.getDatabase().getOnlineClientFriendsById(this.Id);
 			
@@ -492,7 +520,7 @@ public class Penguin
 			e.printStackTrace();
 		}
 		
-		return "%";
+		return "";
 	}
 	
 	public void handleBuddyOnline()
@@ -531,7 +559,10 @@ public class Penguin
 	{
 		this.sendError(1);
 	
-		this.handleBuddyOffline();
+		if(this.Server.getServerInfo().Type == ServerType.GAME)
+		{
+			this.handleBuddyOffline();
+		}
 	}
 	
 	public Socket getSocket()
@@ -541,11 +572,11 @@ public class Penguin
 
 	public String getInventoryString() 
 	{
-		String inv = "%";
+		String inv = "";
 		
 		for(int i : this.Inventory)
 		{
-			inv += i + "%";
+			inv += "%" + i;
 		}
 		
 		return inv;
@@ -555,19 +586,24 @@ public class Penguin
 	{
 		this.Frame = frameID;
 		
-		this.sendRoom("%xt%sf%" + roomID + "%" + this.Id + "%" + frameID + "%");
+		this.sendRoom(this.buildXTMessage("sf", roomID, this.Id, frameID));
 	}
 	
 	public void sendActionUpdate(int roomID, int actionID)
 	{
 		this.Action = actionID;
 		
-		this.sendRoom("%xt%sa%" + roomID + "%" + this.Id + "%" + actionID + "%");
+		this.sendRoom(this.buildXTMessage("sa", roomID, this.Id, actionID));
+	}
+	
+	public void throwSnowball(int roomID, int x, int y)
+	{
+		this.sendRoom(this.buildXTMessage("sb", roomID, this.Id, x, y));
 	}
 	
 	public void sendClothingUpdate(String sub, int roomID, int itemID)
 	{
-		String str = "%xt%" + sub + "%" + roomID + "%" + this.Id + "%" + itemID + "%";
+		String str = this.buildXTMessage(sub, roomID, this.Id, itemID);
 		
 		switch(sub)
 		{

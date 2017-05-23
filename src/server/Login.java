@@ -68,7 +68,7 @@ public class Login extends Server
 	{
 		for(Penguin client : this.Clients)
 		{
-			client.sendError(1);
+			client.kickStop();
 		}
 		
 		this.Clients.clear();
@@ -76,5 +76,9 @@ public class Login extends Server
 		this.Threads.shutdownNow();
 		
 		this.ServerThread.stop();
+	}
+
+	public void registerEvents() 
+	{
 	}
 }
