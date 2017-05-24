@@ -22,7 +22,7 @@ public class GetServerListEvent extends ChildEvent
 		
 		try
 		{
-			List<ServerInfo> serverList = this.getEvent().getServer().getDatabase().getServerList();
+			List<ServerInfo> serverList = this.getEvent().getServer().getDatabase().getOnlineServerList();
 			
 			for(ServerInfo server : serverList)
 			{

@@ -82,7 +82,7 @@ public class Game extends Server
 		
 		this.ServerThread.start();
 	
-		this.Database.saveServer(this.ServerInfo);
+		this.Database.updateServer(this.ServerInfo);
 	}
 
 	public void onDisconnect(Penguin client)
@@ -104,7 +104,7 @@ public class Game extends Server
 	@SuppressWarnings("deprecation")
 	public void stop() throws Exception
 	{
-		remove();
+		clear();
 		
 		for(Penguin client : this.Clients)
 		{
@@ -117,6 +117,11 @@ public class Game extends Server
 		
 		if(this.ServerThread != null)
 			this.ServerThread.stop();
+	}
+	
+	public void registerCommands()
+	{
+		
 	}
 
 	public void registerEvents() 

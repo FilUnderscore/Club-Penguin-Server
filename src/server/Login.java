@@ -77,6 +77,10 @@ public class Login extends Server
 		
 		this.ServerThread.stop();
 	}
+	
+	public void registerCommands()
+	{	
+	}
 
 	public void registerEvents() 
 	{

@@ -204,6 +204,8 @@ public class Penguin
 				
 				this.Age = Days.daysBetween(new DateTime(data.getTimestamp("joindate").getTime()), new DateTime()).getDays();
 				
+				this.Ranking = StaffRank.valueOf(new JSONObject(data.getString("ranking")).getString("rank"));
+				
 				JSONObject membership = new JSONObject(data.getString("membership"));
 				
 				this.MembershipStatus = membership.getInt("status");
@@ -312,6 +314,11 @@ public class Penguin
 	
 	public void sendMessage(int roomID, String text)
 	{
+		if(this.Ranking == StaffRank.MODERATOR && this.Server.getCommandManager().runCommand(this, text))
+		{
+			return;
+		}
+		
 		try
 		{
 			this.Server.getDatabase().logChatMessage(this.Id, text);

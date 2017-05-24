@@ -218,19 +218,34 @@ public class Database
 		return servers;
 	}
 	
-	public void saveServer(ServerInfo info) throws Exception
+	public List<ServerInfo> getOnlineServerList() throws Exception
 	{
-		if(this.Connection.prepareStatement("SELECT * FROM `servers` WHERE id = '" + info.Id + "';").executeQuery().next())
+		List<ServerInfo> servers = new ArrayList<>();
+		
+		ResultSet results = this.Connection.prepareStatement("SELECT * FROM `servers`;").executeQuery();
+		
+		while(results.next())
 		{
-			removeServer(info.Id);
+			if(results.getBoolean("online"))
+			{
+				ServerInfo server = new ServerInfo(results.getInt("id"), results.getString("name"), results.getString("address"), results.getInt("port"), results.getBoolean("safeChatMode"));
+				server.setPopulation(results.getInt("population"));
+				
+				servers.add(server);
+			}
 		}
-			
-		this.Connection.prepareStatement("INSERT INTO `servers` (id, name, address, port, safeChatMode, population) VALUES ('" + info.Id + "','" + info.Name + "','" + info.Address + "','" + info.Port + "','" + (info.SafeChatMode ? "1" : "0") + "','" + info.Count + "');").executeUpdate();
+		
+		return servers;
 	}
 	
-	public void removeServer(int id) throws Exception
+	public void updateServer(ServerInfo info) throws Exception
 	{
-		this.Connection.prepareStatement("DELETE FROM `servers` WHERE id = '" + id + "';").executeUpdate();
+		this.Connection.prepareStatement("UPDATE `servers` SET online = '" + 1 + "', population = '" + info.Count + "' WHERE id = '" + info.Id + "';").executeUpdate();
+	}
+	
+	public void clearServer(int id) throws Exception
+	{
+		this.Connection.prepareStatement("UPDATE `servers` SET online = '" + 0 + "', population = '" + 0 + "' WHERE id = '" + id + "';").executeUpdate();
 	}
 	
 	public String getLoginKey(String username) throws Exception
