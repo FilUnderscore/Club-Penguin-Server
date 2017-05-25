@@ -4,7 +4,14 @@ import server.player.Penguin;
 
 public abstract class XTEvent extends Event
 {
-	public final void processEvent(Penguin penguin, String packet)
+	private String extension;
+	
+	public XTEvent(String extension)
+	{
+		this.extension = extension;
+	}
+	
+	public final XTEvent processEvent(Penguin penguin, String packet)
 	{
 		if(packet.startsWith("%"))
 		{
@@ -17,9 +24,31 @@ public abstract class XTEvent extends Event
 				args[i - 4] = data[i];
 			}
 			
-			process(penguin, data[3], args);
+			String ext = data[3];
+			
+			if(ext.equalsIgnoreCase(this.extension))
+			{
+				process(penguin, args);
+				return this;
+			}
+			else if(ext.startsWith(this.extension))
+			{
+				process(penguin, ext, args);
+				return this;
+			}
+			
+			return null;
+		}
+		else
+		{
+			return null;
 		}
 	}
 	
-	public abstract void process(Penguin penguin, String type, String[] args);
+	public void process(Penguin penguin, String type, String[] args)
+	{
+		
+	}
+	
+	public abstract void process(Penguin penguin, String[] args);
 }

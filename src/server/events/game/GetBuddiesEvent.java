@@ -5,11 +5,13 @@ import server.player.Penguin;
 
 public class GetBuddiesEvent extends XTEvent
 {
-	public void process(Penguin penguin, String type, String[] args) 
+	public GetBuddiesEvent() 
 	{
-		if(type.equalsIgnoreCase("b#gb"))
-		{
-			penguin.sendData(penguin.buildXTMessage("gb", args[0], penguin.getBuddyString()));
-		}
+		super("b#gb");
+	}
+	
+	public void process(Penguin penguin, String[] args) 
+	{
+		penguin.sendData(penguin.buildXTMessage("gb", args[0], penguin.getBuddyString()));
 	}
 }

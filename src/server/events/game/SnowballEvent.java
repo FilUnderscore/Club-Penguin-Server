@@ -5,11 +5,13 @@ import server.player.Penguin;
 
 public class SnowballEvent extends XTEvent
 {
-	public void process(Penguin penguin, String type, String[] args) 
+	public SnowballEvent()
 	{
-		if(type.equalsIgnoreCase("u#sb"))
-		{
-			penguin.throwSnowball(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
-		}
+		super("u#sb");
+	}
+	
+	public void process(Penguin penguin, String[] args) 
+	{
+		penguin.throwSnowball(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
 	}
 }

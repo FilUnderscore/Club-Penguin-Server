@@ -1,6 +1,5 @@
 package server;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -10,13 +9,9 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-
 import server.command.CommandManager;
 import server.event.EventManager;
 import server.player.Penguin;
-import server.util.Crypto;
 import server.util.Logger;
 
 public abstract class Server 
@@ -105,6 +100,12 @@ public abstract class Server
 		
 		while(true)
 		{
+			if(client.IdleMins >= 10)
+			{
+				onDisconnect(client);
+				break;
+			}
+			
 			try
 			{
 				byte[] data = new byte[65536];

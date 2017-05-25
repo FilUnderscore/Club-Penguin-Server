@@ -5,11 +5,13 @@ import server.player.Penguin;
 
 public class SendFrameEvent extends XTEvent
 {
-	public void process(Penguin penguin, String type, String[] args) 
+	public SendFrameEvent()
 	{
-		if(type.equalsIgnoreCase("u#sf"))
-		{
-			penguin.sendFrameUpdate(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-		}
+		super("u#sf");
+	}
+	
+	public void process(Penguin penguin, String[] args) 
+	{
+		penguin.sendFrameUpdate(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
 	}
 }

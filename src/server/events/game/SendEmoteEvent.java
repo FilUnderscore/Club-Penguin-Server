@@ -5,11 +5,13 @@ import server.player.Penguin;
 
 public class SendEmoteEvent extends XTEvent
 {
-	public void process(Penguin penguin, String type, String[] args) 
+	public SendEmoteEvent()
 	{
-		if(type.equalsIgnoreCase("u#se"))
-		{
-			penguin.sendEmote(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-		}
+		super("u#se");
+	}
+	
+	public void process(Penguin penguin, String[] args) 
+	{
+		penguin.sendEmote(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
 	}
 }

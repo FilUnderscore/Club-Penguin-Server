@@ -7,7 +7,7 @@ public abstract class Event
 {
 	private Server server;
 	
-	public abstract void processEvent(Penguin penguin, String text);
+	public abstract Event processEvent(Penguin penguin, String text);
 	
 	public final void setServer(Server server)
 	{

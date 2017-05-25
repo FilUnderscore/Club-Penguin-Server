@@ -5,11 +5,13 @@ import server.player.Penguin;
 
 public class JoinRoomEvent extends XTEvent
 {
-	public void process(Penguin penguin, String type, String[] args) 
+	public JoinRoomEvent()
 	{
-		if(type.equalsIgnoreCase("j#jr"))
-		{
-			penguin.joinRoom(Integer.parseInt(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]));
-		}
+		super("j#jr");
+	}
+	
+	public void process(Penguin penguin, String[] args) 
+	{
+		penguin.joinRoom(Integer.parseInt(args[1]), Integer.parseInt(args[2]), Integer.parseInt(args[3]));
 	}
 }

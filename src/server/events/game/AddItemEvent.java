@@ -5,11 +5,13 @@ import server.player.Penguin;
 
 public class AddItemEvent extends XTEvent
 {
-	public void process(Penguin penguin, String type, String[] args) 
+	public AddItemEvent() 
 	{
-		if(type.equalsIgnoreCase("i#ai"))
-		{
-			penguin.addItem(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-		}
+		super("i#ai");
+	}
+
+	public void process(Penguin penguin, String[] args) 
+	{
+		penguin.addItem(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
 	}
 }

@@ -5,11 +5,13 @@ import server.player.Penguin;
 
 public class SetPositionEvent extends XTEvent
 {
-	public void process(Penguin penguin, String type, String[] args) 
+	public SetPositionEvent()
 	{
-		if(type.equalsIgnoreCase("u#sp"))
-		{
-			penguin.move(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
-		}
+		super("u#sp");
+	}
+	
+	public void process(Penguin penguin, String[] args) 
+	{
+		penguin.move(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
 	}
 }

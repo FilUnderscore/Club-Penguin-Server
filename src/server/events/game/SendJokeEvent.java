@@ -5,11 +5,13 @@ import server.player.Penguin;
 
 public class SendJokeEvent extends XTEvent
 {
-	public void process(Penguin penguin, String type, String[] args) 
+	public SendJokeEvent()
 	{
-		if(type.equalsIgnoreCase("u#sj"))
-		{
-			penguin.sendJokeMessage(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-		}
+		super("u#sj");
+	}
+	
+	public void process(Penguin penguin, String[] args) 
+	{
+		penguin.sendJokeMessage(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
 	}
 }

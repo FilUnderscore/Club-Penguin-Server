@@ -5,11 +5,22 @@ import server.player.Penguin;
 
 public class HeartbeatEvent extends XTEvent
 {
-	public void process(Penguin penguin, String type, String[] args) 
+	public HeartbeatEvent()
 	{
-		if(type.equalsIgnoreCase("u#h"))
+		super("u#h");
+	}
+	
+	public void process(Penguin penguin, String[] args) 
+	{
+		if(penguin.PreviousEvent instanceof HeartbeatEvent)
 		{
-			penguin.sendData(penguin.buildXTMessage("h", args[0]));
+			penguin.IdleMins++;
 		}
+		else
+		{
+			penguin.IdleMins = 0;
+		}
+		
+		penguin.sendData(penguin.buildXTMessage("h", args[0]));
 	}
 }

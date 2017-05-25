@@ -5,11 +5,13 @@ import server.player.Penguin;
 
 public class SendMessageEvent extends XTEvent
 {
-	public void process(Penguin penguin, String type, String[] args) 
+	public SendMessageEvent()
 	{
-		if(type.equalsIgnoreCase("m#sm"))
-		{
-			penguin.sendMessage(Integer.parseInt(args[0]), args[2]);
-		}
+		super("m#sm");
+	}
+	
+	public void process(Penguin penguin, String[] args) 
+	{
+		penguin.sendMessage(Integer.parseInt(args[0]), args[2]);
 	}
 }

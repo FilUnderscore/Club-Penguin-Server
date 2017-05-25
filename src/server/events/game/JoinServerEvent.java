@@ -7,11 +7,13 @@ import server.util.Values;
 
 public class JoinServerEvent extends XTEvent
 {
-	public void process(Penguin penguin, String type, String[] args) 
+	public JoinServerEvent()
 	{
-		if(type.equalsIgnoreCase("j#js"))
-		{
-			penguin.sendData(penguin.buildXTMessage("js", args[0], penguin.Id, Values.getBool(penguin.IsEPF), Values.getBool(penguin.Ranking == StaffRank.MODERATOR), 0));
-		}
+		super("j#js");
+	}
+	
+	public void process(Penguin penguin, String[] args) 
+	{
+		penguin.sendData(penguin.buildXTMessage("js", args[0], penguin.Id, Values.getBool(penguin.IsEPF), Values.getBool(penguin.Ranking == StaffRank.MODERATOR), 0));
 	}
 }

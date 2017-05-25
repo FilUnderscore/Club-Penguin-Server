@@ -12,7 +12,7 @@ import org.json.JSONObject;
 
 import server.Server;
 import server.ServerType;
-import server.util.Logger;
+import server.event.Event;
 
 public class Penguin 
 {
@@ -117,6 +117,17 @@ public class Penguin
 	
 	public int MembershipDaysLeft = 1440;
 	
+	/**
+	 * Events
+	 */
+	
+	public Event PreviousEvent;
+	
+	/**
+	 * If IdleMins reaches 10, disconnect client and only add per heartbeat
+	 */
+	public int IdleMins = 0;
+	
 	protected Penguin()
 	{
 	}
@@ -131,8 +142,6 @@ public class Penguin
 	{
 		data += '\u0000';
 		
-		Logger.notice("Sending data: " + data, this.Server);
-		
 		try
 		{
 			this.Socket.getOutputStream().write(data.getBytes("UTF-8"));
@@ -140,7 +149,7 @@ public class Penguin
 		}
 		catch(Exception e)
 		{
-			//Error while sending data to SWF Client.e
+			//Error while sending data to SWF Client.
 			e.printStackTrace();
 		}
 	}
@@ -149,7 +158,7 @@ public class Penguin
 	{
 		for(Penguin client : this.Server.getClients())
 		{
-			if(client.getRoom() == this.Room)
+			if(client.getRoom() == this.Room && client.Id != this.Id)
 			{
 				client.sendData(data);
 			}

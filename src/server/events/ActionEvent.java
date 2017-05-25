@@ -10,7 +10,7 @@ public class ActionEvent extends XMLEvent
 {
 	public void process(Penguin penguin, Element packet) 
 	{
-		if(packet.getAttributeValue("t").equalsIgnoreCase("sys"))
+		if(packet.getAttribute("t") != null && packet.getAttributeValue("t").equalsIgnoreCase("sys"))
 		{
 			switch(packet.getChild("body").getAttributeValue("action").toLowerCase())
 			{

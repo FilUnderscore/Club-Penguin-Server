@@ -46,9 +46,23 @@ public class EventManager
 	
 	public void handleEvents(Penguin client, String packet)
 	{	
+		Event handledEvent = null;
+		
 		for(Event event : this.Events)
 		{
-			event.processEvent(client, packet);
+			if(event.processEvent(client, packet) != null)
+			{
+				handledEvent = event;
+			}
+		}
+		
+		if(handledEvent == null)
+		{
+			Logger.warning('\n' + "Event unhandled '" + packet + "'!", this.Server);
+		}
+		else
+		{
+			client.PreviousEvent = handledEvent;
 		}
 	}
 }
