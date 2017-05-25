@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import server.commands.StopServerCommand;
 import server.events.game.AddItemEvent;
 import server.events.game.GetBuddiesEvent;
 import server.events.game.GetInventoryEvent;
@@ -121,7 +122,7 @@ public class Game extends Server
 	
 	public void registerCommands()
 	{
-		
+		this.CommandManager.registerCommand(new StopServerCommand());
 	}
 
 	public void registerEvents() 

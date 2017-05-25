@@ -13,6 +13,8 @@ public class CommandManager
 	
 	protected Map<String, Command> Commands;
 	
+	public static String COMMAND_PREFIX = "!";
+	
 	public CommandManager(Server server)
 	{
 		this.server = server;
@@ -23,6 +25,14 @@ public class CommandManager
 	public void init()
 	{
 		Logger.info("{CommandManager} Loaded " + this.Commands.size() + " Commands!", this.server);
+	}
+	
+	public void registerCommand(Command cmd)
+	{
+		if(!this.Commands.containsKey(cmd.getCommand()))
+		{
+			this.Commands.put(cmd.getCommand(), cmd);
+		}
 	}
 	
 	public boolean commandExists(String cmd)
@@ -37,6 +47,11 @@ public class CommandManager
 	
 	public boolean runCommand(Penguin client, String cmd)
 	{
+		if(!cmd.startsWith(COMMAND_PREFIX))
+		{
+			return false;
+		}
+		
 		cmd = cmd.substring(1);
 		
 		if(this.commandExists(cmd))
