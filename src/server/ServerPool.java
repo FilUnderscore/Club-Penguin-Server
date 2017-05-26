@@ -122,4 +122,19 @@ public class ServerPool
 		
 		return str;
 	}
+	
+	public static void stopServers()
+	{
+		for(Server server : ServerPool.getServers())
+		{
+			try
+			{
+				server.stop();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
 }

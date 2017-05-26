@@ -8,6 +8,8 @@ public class Main
 	{
 		new Crumbs();
 		
-		new Console(ServerPool.getServers());
+		new ServerPool();
+		
+		new Console();
 	}
 }

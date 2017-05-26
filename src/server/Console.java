@@ -1,18 +1,13 @@
 package server;
 
-import java.util.List;
 import java.util.Scanner;
 
 public class Console 
 {
-	private List<Server> Servers;
-	
 	private Thread ConsoleThread;
 	
-	public Console(List<server.Server> servers)
+	public Console()
 	{
-		this.Servers = servers;
-		
 		init();
 	}
 	
@@ -33,17 +28,7 @@ public class Console
 					{
 						scanner.close();
 						
-						for(Server server : Servers)
-						{
-							try
-							{
-								server.stop();
-							}
-							catch(Exception e)
-							{
-								e.printStackTrace();
-							}
-						}
+						ServerPool.stopServers();
 						
 						System.exit(0);
 						ConsoleThread.stop();
