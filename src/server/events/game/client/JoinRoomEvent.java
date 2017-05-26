@@ -1,4 +1,4 @@
-package server.events.game;
+package server.events.game.client;
 
 import server.event.XTEvent;
 import server.player.Penguin;
