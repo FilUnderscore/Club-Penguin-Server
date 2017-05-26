@@ -7,8 +7,8 @@ import java.util.List;
 
 import server.Server;
 import server.ServerInfo;
-import server.commands.AddInventoryCommand;
-import server.commands.StopServerCommand;
+import server.command.commands.AddInventoryCommand;
+import server.command.commands.StopServerCommand;
 import server.event.events.game.client.HeartbeatEvent;
 import server.event.events.game.client.JoinRoomEvent;
 import server.event.events.game.client.JoinServerEvent;

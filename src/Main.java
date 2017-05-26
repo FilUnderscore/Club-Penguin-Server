@@ -1,5 +1,5 @@
+import server.Console;
 import server.ServerPool;
-import server.console.Console;
 import server.data.Crumbs;
 
 public class Main 

@@ -1,19 +1,19 @@
-package server.commands;
+package server.command.commands;
 
 import server.Server;
 import server.command.Command;
 import server.player.Penguin;
 import server.player.StaffRank;
 
-public class AddInventoryCommand extends Command
+public class StopServerCommand extends Command
 {
-	public AddInventoryCommand()
+	public StopServerCommand() 
 	{
-		super("addinv", StaffRank.MODERATOR);
+		super("srvstop", StaffRank.MODERATOR);
 	}
 
 	public void execute(Server server, Penguin client, String[] args) 
 	{
-		client.addItem(-1, Integer.parseInt(args[1]));
+		
 	}
 }

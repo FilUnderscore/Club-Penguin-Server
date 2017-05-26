@@ -1,9 +1,7 @@
-package server.console;
+package server;
 
 import java.util.List;
 import java.util.Scanner;
-
-import server.Server;
 
 public class Console 
 {
