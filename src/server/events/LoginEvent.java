@@ -1,14 +1,19 @@
 package server.events;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jdom.Element;
 
+import server.ServerPool;
 import server.ServerType;
 import server.event.ChildEvent;
 import server.event.XMLEvent;
 import server.player.Penguin;
 import server.util.Crypto;
+import server.util.ListUtil;
 
 public class LoginEvent extends ChildEvent
 {
@@ -92,14 +97,49 @@ public class LoginEvent extends ChildEvent
 			try
 			{
 				List<Integer> friendData = this.getEvent().getServer().getDatabase().getOnlineClientFriendsById(clientId);
+				Map<Integer, List<Integer>> friendMap = new HashMap<>();
 				
 				if(friendData.size() > 0)
-				{
-					friends += friendData.get(0);
-					
-					for(int i = 1; i < friendData.size(); i++)
+				{	
+					for(int i = 0; i < friendData.size(); i++)
 					{
-						friends += "|" + friendData.get(i);
+						int friendID = friendData.get(i);
+						Penguin friend = ServerPool.getPenguin(friendID);
+						
+						if(friend != null)
+						{
+							int serverID = friend.Server.getServerInfo().Id;
+							
+							List<Integer> friendTempList = new ArrayList<>();
+							
+							if(friendMap.containsKey(serverID))
+								friendTempList = friendMap.get(serverID);
+							
+							friendTempList.add(friendID);
+						}
+					}
+					
+					/*
+					for(int key : friendMap.keySet())
+					{
+						friends += key + "|" + ListUtil.toString(friendMap.get(key));
+					}
+					*/
+					
+					int i = 0;
+					
+					for(int key : friendMap.keySet())
+					{
+						if(i == 0)
+						{
+							friends += key + "|" + ListUtil.toString(friendMap.get(key));
+						}
+						else
+						{
+							friends += "," + key + "|" + ListUtil.toString(friendMap.get(key));
+						}
+						
+						i++;
 					}
 				}
 			}
@@ -108,7 +148,7 @@ public class LoginEvent extends ChildEvent
 				e.printStackTrace();
 			}
 			
-			penguin.sendData(penguin.buildXTMessage("l", -1, clientId, loginKey, friends));
+			penguin.sendData(penguin.buildXTMessage("l", -1, clientId, loginKey, friends, ServerPool.getWorldPopulationString()));
 			
 			penguin.Id = clientId;
 			penguin.LoginKey = loginKey;

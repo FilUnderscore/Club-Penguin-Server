@@ -48,6 +48,8 @@ public class EventManager
 	{	
 		Event handledEvent = null;
 		
+		System.out.println(packet);
+		
 		for(Event event : this.Events)
 		{
 			if(event.processEvent(client, packet) != null)

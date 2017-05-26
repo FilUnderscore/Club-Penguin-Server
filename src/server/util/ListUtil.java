@@ -22,11 +22,22 @@ public class ListUtil
 		return str;
 	}
 	
+	public static void removeFromList(int id, List<Integer> list)
+	{
+		for(int i = 0; i < list.size(); i++)
+		{
+			if(list.get(i) == id)
+			{
+				list.remove(i);
+			}
+		}
+	}
+	
 	public static List<Integer> toInt(String str)
 	{
 		List<Integer> list = new ArrayList<>();
 		
-		if(str.length() > 0)
+		if(str != null && str.length() > 0)
 		{
 			String[] oneArr = str.split(",");
 			

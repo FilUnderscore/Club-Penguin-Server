@@ -5,14 +5,20 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import server.commands.AddInventoryCommand;
 import server.commands.StopServerCommand;
 import server.events.game.AddItemEvent;
+import server.events.game.BuddyAcceptEvent;
+import server.events.game.BuddyFindEvent;
+import server.events.game.BuddyRequestEvent;
 import server.events.game.GetBuddiesEvent;
 import server.events.game.GetInventoryEvent;
 import server.events.game.GetPlayerEvent;
 import server.events.game.HeartbeatEvent;
 import server.events.game.JoinRoomEvent;
 import server.events.game.JoinServerEvent;
+import server.events.game.MailStartEvent;
+import server.events.game.RemoveBuddyEvent;
 import server.events.game.SendActionEvent;
 import server.events.game.SendEmoteEvent;
 import server.events.game.SendFrameEvent;
@@ -123,6 +129,7 @@ public class Game extends Server
 	public void registerCommands()
 	{
 		this.CommandManager.registerCommand(new StopServerCommand());
+		this.CommandManager.registerCommand(new AddInventoryCommand());
 	}
 
 	public void registerEvents() 
@@ -143,5 +150,10 @@ public class Game extends Server
 		this.EventManager.registerEvent(new SendSafeMessageEvent());
 		this.EventManager.registerEvent(new SendEmoteEvent());
 		this.EventManager.registerEvent(new GetBuddiesEvent());
+		this.EventManager.registerEvent(new BuddyRequestEvent());
+		this.EventManager.registerEvent(new BuddyAcceptEvent());
+		this.EventManager.registerEvent(new RemoveBuddyEvent());
+		this.EventManager.registerEvent(new BuddyFindEvent());
+		this.EventManager.registerEvent(new MailStartEvent());
 	}
 }

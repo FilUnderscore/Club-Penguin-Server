@@ -221,6 +221,19 @@ public abstract class Server
 		return this.Clients;
 	}
 	
+	public final Penguin getPenguin(int userId)
+	{
+		for(Penguin penguin : getClients())
+		{
+			if(penguin.Id == userId)
+			{
+				return penguin;
+			}
+		}
+		
+		return null;
+	}
+	
 	public final ServerInfo getServerInfo()
 	{
 		return this.ServerInfo;

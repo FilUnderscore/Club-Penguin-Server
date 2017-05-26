@@ -12,7 +12,10 @@ import org.json.JSONObject;
 
 import server.Server;
 import server.ServerType;
+import server.data.Crumbs;
+import server.data.Postcard;
 import server.event.Event;
+import server.util.ListUtil;
 
 public class Penguin 
 {
@@ -94,6 +97,8 @@ public class Penguin
 	public List<Integer> Friends;
 	
 	public List<Integer> Ignored;
+	
+	public List<Postcard> Mail;
 	
 	public ArrayList<Integer> Stamps;
 	
@@ -177,6 +182,11 @@ public class Penguin
 	
 	public static Penguin loadPenguin(int userId, Server server)
 	{
+		if(server.getPenguin(userId) != null)
+		{
+			return server.getPenguin(userId);
+		}
+		
 		try
 		{
 			Penguin penguin = new Penguin();
@@ -211,6 +221,8 @@ public class Penguin
 				this.Color = data.getInt("color");
 				this.Coins = data.getInt("coins");
 				
+				this.Friends = this.Server.getDatabase().getClientFriendIdsById(this.Id);
+				
 				this.Age = Days.daysBetween(new DateTime(data.getTimestamp("joindate").getTime()), new DateTime()).getDays();
 				
 				this.Ranking = StaffRank.valueOf(new JSONObject(data.getString("ranking")).getString("rank"));
@@ -244,6 +256,18 @@ public class Penguin
 				
 				this.Inventory = this.Server.getDatabase().getPenguinInventoryById(this.Id);
 			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void savePenguin()
+	{
+		try
+		{
+			this.Server.getDatabase().updateFriends(this.Friends, this.Id);
 		}
 		catch(Exception e)
 		{
@@ -371,8 +395,13 @@ public class Penguin
 	
 	public void addItem(int roomID, int itemId)
 	{
-		//Lookup Item in Crumbs and get cost
-		int cost = 0;
+		if(Crumbs.getItem(itemId) == null)
+		{
+			this.sendError(402);
+			return;
+		}
+		
+		int cost = Crumbs.getItem(itemId).getCost();
 		
 		if(this.Inventory.contains(itemId))
 		{
@@ -386,8 +415,6 @@ public class Penguin
 			return;
 		}
 		
-		//402: Item not available;
-		
 		this.Inventory.add(itemId);
 		this.deductCoins(cost);
 		
@@ -400,7 +427,7 @@ public class Penguin
 			e.printStackTrace();
 		}
 		
-		this.sendData(this.buildXTMessage("ai", roomID, itemId, cost));
+		this.sendData(this.buildXTMessage("ai", roomID, itemId, this.Coins));
 	}
 	
 	public int getCurrentRoomCount()
@@ -495,13 +522,27 @@ public class Penguin
 	public void addCoins(int amount)
 	{
 		this.Coins += amount;
-		//TODO: Save in MySQL database
+	
+		saveCoins();
 	}
 	
 	public void deductCoins(int amount)
 	{
 		this.Coins -= amount;
-		//TODO: Save in MySQL database
+		
+		saveCoins();
+	}
+	
+	private void saveCoins()
+	{
+		try
+		{
+			this.Server.getDatabase().updateCoins(this.Id, this.Coins);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	public void removePlayerFromRoom()
@@ -546,6 +587,8 @@ public class Penguin
 			this.Server.getDatabase().updateOnlineStatus(this.Id, true);
 		
 			this.Friends = this.Server.getDatabase().getClientFriendIdsById(this.Id);
+			
+			sendFriends(this.buildXTMessage("bon", "-1", this.Id));
 		}
 		catch(Exception e)
 		{
@@ -556,11 +599,29 @@ public class Penguin
 		//see https://github.com/titshacking/RBSE/blob/master/Core/CPUser.rb handleBuddyOnline
 	}
 	
+	public void sendFriends(String data)
+	{
+		if(this.Friends == null)
+			return;
+		
+		for(int friendId : this.Friends)
+		{
+			Penguin friend = this.Server.getPenguin(friendId);
+			
+			if(friend != null)
+			{
+				friend.sendData(data);
+			}
+		}
+	}
+	
 	public void handleBuddyOffline()
 	{
 		try
 		{
 			this.Server.getDatabase().updateOnlineStatus(this.Id, false);
+			
+			sendFriends(this.buildXTMessage("bof", "-1", this.Id));
 		}
 		catch(Exception e)
 		{
@@ -569,6 +630,96 @@ public class Penguin
 		
 		//TODO
 		//see https://github.com/titshacking/RBSE/blob/master/Core/CPUser.rb handleBuddyOffline
+	}
+	
+	public void removeFriend(int roomID, int userID)
+	{
+		Penguin user = Penguin.loadPenguin(userID, this.Server);
+		
+		if(user != null)
+		{
+			ListUtil.removeFromList(this.Id, user.Friends);
+			ListUtil.removeFromList(userID, this.Friends);
+			
+			if(user.Socket != null)
+			{
+				user.sendData(this.buildXTMessage("rb", roomID, this.Id));
+			}
+			
+			user.savePenguin();
+			savePenguin();
+		}
+	}
+	
+	public void sendFriendRequest(int roomID, int userID)
+	{
+		Penguin user = this.Server.getPenguin(userID);
+		
+		if(user != null)
+		{
+			user.sendData(this.buildXTMessage("br", roomID, this.Id, this.Username));
+			
+			user.savePenguin();
+			savePenguin();
+		}
+	}
+	
+	public void findFriend(int roomID, int friendID)
+	{
+		Penguin friend = this.Server.getPenguin(friendID);
+		
+		if(friend != null)
+		{
+			this.sendData(this.buildXTMessage("bf", roomID, friend.Room));
+		}
+	}
+	
+	public void denyFriendRequest(int requestId)
+	{
+		//TODO: Implement Friend Request Deny
+	}
+	
+	public void acceptFriendRequest(int roomID, int requestID)
+	{
+		Penguin request = Penguin.loadPenguin(requestID, this.Server);
+		
+		if(request != null)
+		{
+			request.Friends.add(this.Id);
+			this.Friends.add(requestID);
+			
+			if(request.Socket != null)
+			{
+				request.sendData(this.buildXTMessage("ba", roomID, this.Id, this.Username));
+			}
+			
+			request.savePenguin();
+			savePenguin();
+		}
+	}
+	
+	public void loadMail(int roomID)
+	{
+		try
+		{
+			this.Mail = this.Server.getDatabase().getUserPostcards(this.Id);
+		
+			int unreadCount = 0;
+			
+			for(Postcard postcard : this.Mail)
+			{
+				if(!postcard.isRead())
+				{
+					unreadCount++;
+				}
+			}
+			
+			this.sendData(this.buildXTMessage("mst", roomID, unreadCount));
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	public void kickStop()
@@ -590,9 +741,12 @@ public class Penguin
 	{
 		String inv = "";
 		
-		for(int i : this.Inventory)
+		if(this.Inventory != null)
 		{
-			inv += "%" + i;
+			for(int i : this.Inventory)
+			{
+				inv += "%" + i;
+			}
 		}
 		
 		return inv;

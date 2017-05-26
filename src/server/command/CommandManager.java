@@ -53,10 +53,12 @@ public class CommandManager
 		}
 		
 		cmd = cmd.substring(1);
+		String shortenedCmd = cmd.split(" ")[0];
 		
-		if(this.commandExists(cmd))
+		if(this.commandExists(shortenedCmd))
 		{
-			this.Commands.get(cmd).execute(this.server, client, cmd.split(" "));
+			this.Commands.get(shortenedCmd).execute(this.server, client, cmd.split(" "));
+			Logger.info("cmd: " + shortenedCmd + " args: " + cmd.split(" ")[0], null);
 			
 			return true;
 		}

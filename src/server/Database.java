@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.json.JSONObject;
 
+import server.data.Postcard;
 import server.util.ListUtil;
 import server.util.Logger;
 
@@ -15,6 +16,11 @@ public class Database
 {
 	protected Server Server;
 	protected Connection Connection;
+	
+	public Database()
+	{
+		
+	}
 	
 	public Database(Server server)
 	{
@@ -151,7 +157,7 @@ public class Database
 	
 	public void updateFriends(List<Integer> friends, int userId) throws Exception
 	{
-		this.Connection.prepareStatement("UPDATE `users` SET buddies = '" + ListUtil.toString(friends) + "' WHERE id = '" + userId + "';").executeUpdate();
+		this.Connection.prepareStatement("UPDATE `users` SET friends = '" + ListUtil.toString(friends) + "' WHERE id = '" + userId + "';").executeUpdate();
 	}
 	
 	public void updateIgnoreList(List<Integer> ignored, int userId) throws Exception
@@ -286,6 +292,20 @@ public class Database
 		return friends;
 	}
 	
+	public List<Integer> getClientFriendRequestIdsById(int userId) throws Exception
+	{
+		List<Integer> requests = new ArrayList<>();
+		
+		ResultSet selfRes = this.Connection.prepareStatement("SELECT * FROM `users` WHERE id = '" + userId + "';").executeQuery();
+		
+		if(selfRes.next())
+		{
+			requests = ListUtil.toInt(selfRes.getString("friendRequests"));
+		}
+		
+		return requests;
+	}
+	
 	public void saveClientFriends(int userId, List<Integer> friends) throws Exception
 	{
 		this.Connection.prepareStatement("UPDATE `users` SET friends = '" + ListUtil.toString(friends) + "' WHERE id = '" + userId + "';");
@@ -388,10 +408,18 @@ public class Database
 		return 0;
 	}
 	
-	public List<Integer> getUserPostcards(int userId)
+	public List<Postcard> getUserPostcards(int userId) throws Exception
 	{
-		//TODO: Implement Mail (return List<Postcard>)
-		return new ArrayList<>();
+		List<Postcard> postcards = new ArrayList<>();
+		
+		ResultSet query = this.Connection.prepareStatement("SELECT * FROM `mail` WHERE toUser = '" + userId + "';").executeQuery();
+		
+		while(query.next())
+		{
+			postcards.add(new Postcard(query.getInt("id"), query.getInt("toUser"), query.getInt("fromUser"), query.getInt("mailType"), query.getString("details"), query.getTimestamp("timestamp").getTime(), query.getBoolean("read")));
+		}
+		
+		return postcards;
 	}
 	
 	public int addPostcard(int receipient, String sender, int senderID, String postcardNotes, int postcardType, int timestamp)
@@ -413,5 +441,10 @@ public class Database
 	public void updatePostcardRead(int userId)
 	{
 		//TODO: Implement Mail
+	}
+	
+	public void updateCoins(int userId, int coins) throws Exception
+	{
+		this.Connection.prepareStatement("UPDATE `users` SET coins = '" + coins + "' WHERE id = '" + userId + "';").executeUpdate();
 	}
 }

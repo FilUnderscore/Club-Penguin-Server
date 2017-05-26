@@ -37,9 +37,9 @@ public class ServerInfo
 	
 	public ServerType Type;
 
-	public ServerInfo(int id, String address, int port)
+	public ServerInfo(int id, String name, String address, int port)
 	{
-		this.Name = "SERVER";
+		this.Name = name;
 		this.Id = id;
 		this.Address = address;
 		this.Port = port;
