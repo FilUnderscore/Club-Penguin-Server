@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import server.Server;
-import server.events.ActionEvent;
-import server.events.PolicyFileRequestEvent;
+import server.event.events.login.ActionEvent;
+import server.event.events.login.PolicyFileRequestEvent;
 import server.player.Penguin;
 import server.util.Logger;
 

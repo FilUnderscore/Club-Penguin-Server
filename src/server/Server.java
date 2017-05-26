@@ -12,6 +12,8 @@ import java.util.concurrent.Executors;
 import server.command.CommandManager;
 import server.event.EventManager;
 import server.player.Penguin;
+import server.servers.Game;
+import server.servers.Login;
 import server.util.Logger;
 
 public abstract class Server 
