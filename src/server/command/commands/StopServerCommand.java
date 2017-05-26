@@ -16,5 +16,7 @@ public class StopServerCommand extends Command
 	public void execute(Server server, Penguin client, String[] args) 
 	{
 		ServerPool.stopServers();
+		
+		System.exit(0);
 	}
 }
