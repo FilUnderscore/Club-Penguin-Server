@@ -316,25 +316,28 @@ public class Penguin
 		
 		this.Frame = 0;
 		
-		if(this.Room != 999)
+		if(Crumbs.getRoom(roomID) != null)
 		{
-			this.Room = roomID;
-			this.X = x;
-			this.Y = y;
-			
-			//this.sendData("%xt%jx%-1%" + roomID + "%");
-			//this.sendData("%xt%jr%-1%" + roomID + "%" + this.getClientString() + "%" + this.getRoomString());
-			//this.sendData("%xt%ap%-1%" + this.getClientString() + "%");
-			
-			this.sendData(buildXTMessage("jx", -1, roomID));
-			this.sendData(buildXTMessage("jr", -1, roomID, this.getClientString() + this.getRoomString()));
-			
-			this.sendRoom(buildXTMessage("ap", -1, this.getClientString()));
-			return;
+			if(this.Server.getPenguins(roomID).size() <= Crumbs.getRoom(roomID).getMaxUsers())
+			{
+				this.Room = roomID;
+				this.X = x;
+				this.Y = y;
+				
+				this.sendData(buildXTMessage("jx", -1, roomID));
+				this.sendData(buildXTMessage("jr", -1, roomID, this.getClientString() + this.getRoomString()));
+				
+				this.sendRoom(buildXTMessage("ap", -1, this.getClientString()));
+			}
+			else
+			{
+				this.sendError(210);
+			}
 		}
-		
-		//TODO
-		//Crumbs see https://github.com/titshacking/RBSE/blob/master/Core/CPUser.rb joinRoom line 220
+		else
+		{
+			this.sendError(213);
+		}
 	}
 	
 	public void move(int roomID, int x, int y)
@@ -594,9 +597,6 @@ public class Penguin
 		{
 			e.printStackTrace();
 		}
-		
-		//TODO
-		//see https://github.com/titshacking/RBSE/blob/master/Core/CPUser.rb handleBuddyOnline
 	}
 	
 	public void sendFriends(String data)
@@ -627,9 +627,6 @@ public class Penguin
 		{
 			e.printStackTrace();
 		}
-		
-		//TODO
-		//see https://github.com/titshacking/RBSE/blob/master/Core/CPUser.rb handleBuddyOffline
 	}
 	
 	public void removeFriend(int roomID, int userID)
@@ -672,11 +669,6 @@ public class Penguin
 		{
 			this.sendData(this.buildXTMessage("bf", roomID, friend.Room));
 		}
-	}
-	
-	public void denyFriendRequest(int requestId)
-	{
-		//TODO: Implement Friend Request Deny
 	}
 	
 	public void acceptFriendRequest(int roomID, int requestID)

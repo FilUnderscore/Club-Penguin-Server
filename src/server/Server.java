@@ -236,6 +236,21 @@ public abstract class Server
 		return null;
 	}
 	
+	public final List<Penguin> getPenguins(int roomID)
+	{
+		List<Penguin> penguins = new ArrayList<>();
+		
+		for(Penguin penguin : getClients())
+		{
+			if(penguin.Room == roomID)
+			{
+				penguins.add(penguin);
+			}
+		}
+		
+		return penguins;
+	}
+	
 	public final ServerInfo getServerInfo()
 	{
 		return this.ServerInfo;
