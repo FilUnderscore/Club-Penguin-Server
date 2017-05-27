@@ -8,6 +8,7 @@ import java.util.List;
 import server.Server;
 import server.ServerInfo;
 import server.command.commands.AddInventoryCommand;
+import server.command.commands.BanPlayerCommand;
 import server.command.commands.StopServerCommand;
 import server.event.events.game.client.HeartbeatEvent;
 import server.event.events.game.client.JoinRoomEvent;
@@ -135,6 +136,7 @@ public class Game extends Server
 	{
 		this.CommandManager.registerCommand(new StopServerCommand());
 		this.CommandManager.registerCommand(new AddInventoryCommand());
+		this.CommandManager.registerCommand(new BanPlayerCommand());
 	}
 
 	public void registerEvents() 

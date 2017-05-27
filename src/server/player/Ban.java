@@ -34,4 +34,16 @@ public class Ban
 	{
 		return new DateTime().isAfter(expireTime);
 	}
+	
+	public void setExpired(boolean b)
+	{
+		if(b)
+		{
+			expireTime = 0;
+		}
+		else
+		{
+			expireTime = -1;
+		}
+	}
 }

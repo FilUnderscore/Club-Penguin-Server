@@ -23,7 +23,7 @@ public class KickEvent extends XTEvent
 	
 		if(user != null)
 		{
-			user.sendError(5);
+			user.sendError(610);
 		}
 	}
 }

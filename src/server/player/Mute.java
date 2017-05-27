@@ -32,6 +32,18 @@ public class Mute
 	
 	public boolean hasExpired()
 	{
-		return new DateTime().isAfter(expireTime);
+		return expireTime != -1 && new DateTime().isAfter(expireTime);
+	}
+	
+	public void setExpired(boolean b)
+	{
+		if(b)
+		{
+			expireTime = 0;
+		}
+		else
+		{
+			expireTime = -1;
+		}
 	}
 }

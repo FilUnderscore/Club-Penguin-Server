@@ -55,7 +55,7 @@ public class CommandManager
 		cmd = cmd.substring(1);
 		String shortenedCmd = cmd.split(" ")[0];
 		
-		if(this.commandExists(shortenedCmd))
+		if(this.commandExists(shortenedCmd) && client.Ranking == this.Commands.get(shortenedCmd).getRank())
 		{
 			this.Commands.get(shortenedCmd).execute(this.server, client, cmd.split(" "));
 			Logger.info("cmd: " + shortenedCmd + " args: " + cmd.split(" ")[0], null);

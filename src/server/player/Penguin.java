@@ -185,6 +185,11 @@ public class Penguin
 	
 	public static Penguin loadPenguin(int userId, Server server)
 	{
+		if(server == null && ServerPool.getPenguin(userId) != null)
+		{
+			return ServerPool.getPenguin(userId);
+		}
+		
 		if(server.getPenguin(userId) != null)
 		{
 			return server.getPenguin(userId);
@@ -283,7 +288,7 @@ public class Penguin
 				{
 					JSONObject moderation = new JSONObject(data.getString("moderation"));
 					
-					JSONArray muteArr = new JSONArray(moderation.getJSONArray("mutes"));
+					JSONArray muteArr = moderation.getJSONArray("mutes");
 					
 					for(int i = 0; i < muteArr.length(); i++)
 					{
@@ -292,7 +297,7 @@ public class Penguin
 						this.Mutes.add(new Mute(mute.getString("reason"), mute.getLong("expireTime"), mute.getInt("moderatorID")));
 					}
 					
-					JSONArray banArr = new JSONArray(moderation.getJSONArray("bans"));
+					JSONArray banArr = moderation.getJSONArray("bans");
 					
 					for(int i = 0; i < banArr.length(); i++)
 					{
@@ -325,9 +330,9 @@ public class Penguin
 				
 				JSONObject muteObj = new JSONObject();
 				
-				muteObj.append("reason", mute.getReason());
-				muteObj.append("expireTime", mute.getExpireTime());
-				muteObj.append("moderatorID", mute.getModeratorId());
+				muteObj.accumulate("reason", mute.getReason());
+				muteObj.accumulate("expireTime", mute.getExpireTime());
+				muteObj.accumulate("moderatorID", mute.getModeratorId());
 
 				muteArr.put(i, muteObj);
 			}
@@ -340,15 +345,15 @@ public class Penguin
 				
 				JSONObject banObj = new JSONObject();
 				
-				banObj.append("reason", ban.getReason());
-				banObj.append("expireTime", ban.getExpireTime());
-				banObj.append("moderatorID", ban.getModeratorId());
+				banObj.accumulate("reason", ban.getReason());
+				banObj.accumulate("expireTime", ban.getExpireTime());
+				banObj.accumulate("moderatorID", ban.getModeratorId());
 
 				banArr.put(i, banObj);
 			}
 			
-			moderation.append("mutes", muteArr);
-			moderation.append("bans", banArr);
+			moderation.accumulate("mutes", muteArr);
+			moderation.accumulate("bans", banArr);
 			
 			this.Server.getDatabase().updateModerationData(this.Id, moderation.toString());
 		}
@@ -469,6 +474,12 @@ public class Penguin
 		
 		if(user != null)
 		{
+			if(user.getRecentBan() != null)
+			{
+				user.getRecentBan().setExpired(true);
+				return;
+			}
+			
 			user.Bans.add(new Ban(reason, (length != -1 ? new DateTime().plus(length).getMillis() : -1), this.Id));
 			
 			user.savePenguin();
@@ -483,6 +494,12 @@ public class Penguin
 		
 		if(user != null)
 		{
+			if(user.getRecentMute() != null)
+			{
+				user.getRecentMute().setExpired(true);
+				return;
+			}
+			
 			user.Mutes.add(new Mute(reason, (length != -1 ? new DateTime().plus(length).getMillis() : -1), this.Id));
 			
 			user.savePenguin();
