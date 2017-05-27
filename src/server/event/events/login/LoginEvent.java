@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.jdom.Element;
+import org.joda.time.DateTime;
+import org.joda.time.Hours;
 
 import server.ServerPool;
 import server.ServerType;
@@ -75,22 +77,24 @@ public class LoginEvent extends ChildEvent
 				}
 			}
 			
-			if(this.getEvent().getServer().getDatabase().getBannedStatus(username).equalsIgnoreCase("PERMBANNED"))
+			int clientId = this.getEvent().getServer().getDatabase().getClientIdByUsername(username);
+			
+			penguin.loadModerationData(clientId);
+			
+			if(penguin.getRecentBan() != null && penguin.getRecentBan().getExpireTime() == -1)
 			{
 				penguin.sendError(603);
 				return;
 			}
-			else if(this.getEvent().getServer().getDatabase().getBannedStatus(username).equalsIgnoreCase("TEMPBANNED"))
+			else if(penguin.getRecentBan() != null && !penguin.getRecentBan().hasExpired() && penguin.getRecentBan().getExpireTime() != -1)
 			{
-				penguin.sendError(601); //Send with rounded time to nearest day/hour?
+				penguin.sendData(penguin.buildXTMessage("e", 601, (Hours.hoursBetween(new DateTime(), new DateTime(penguin.getRecentBan().getExpireTime())))));
 				return;
 			}
 			
 			String loginKey = Crypto.encodeMD5(new StringBuilder(penguin.RandomKey).reverse().toString());
 			
 			this.getEvent().getServer().getDatabase().updateLoginKey(username, loginKey);
-			
-			int clientId = this.getEvent().getServer().getDatabase().getClientIdByUsername(username);
 			
 			String friends = "";
 			
@@ -116,15 +120,10 @@ public class LoginEvent extends ChildEvent
 								friendTempList = friendMap.get(serverID);
 							
 							friendTempList.add(friendID);
+							
+							friendMap.put(serverID, friendTempList);
 						}
 					}
-					
-					/*
-					for(int key : friendMap.keySet())
-					{
-						friends += key + "|" + ListUtil.toString(friendMap.get(key));
-					}
-					*/
 					
 					int i = 0;
 					

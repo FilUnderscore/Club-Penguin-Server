@@ -16,6 +16,7 @@ public final class Crumbs
 	protected static Map<Integer, Item> Items;
 	protected static Map<Integer, Room> Rooms;
 	protected static Map<String, Game> Games;
+	protected static Map<Integer, Mascot> Mascots;
 	
 	static
 	{
@@ -24,6 +25,7 @@ public final class Crumbs
 			initItems();
 			initRooms();
 			initGames();
+			initMascots();
 		}
 		catch(Exception e)
 		{
@@ -44,7 +46,7 @@ public final class Crumbs
 			
 			if(object != null)
 			{
-				Items.put(object.getInt("paper_item_id") - 1, new Item(object.getInt("paper_item_id"), object.getInt("type"), object.getInt("cost"), object.getBoolean("is_member"), object.getString("label"), object.getString("prompt"), object.getInt("layer")));
+				Items.put(object.getInt("paper_item_id"), new Item(object.getInt("paper_item_id"), object.getInt("type"), object.getInt("cost"), object.getBoolean("is_member"), object.getString("label"), object.getString("prompt"), object.getInt("layer")));
 			}
 		}
 		
@@ -96,6 +98,41 @@ public final class Crumbs
 		}
 		
 		Logger.info("Loaded " + Games.size() + " Games!", null);
+	}
+	
+	private static void initMascots() throws Exception
+	{
+		Mascots = new HashMap<>();
+		
+		JSONObject mascotObj = new JSONObject(new String(Files.readAllBytes(Paths.get("res/mascots.json")), StandardCharsets.UTF_8));
+		
+		JSONArray mascotArr = mascotObj.getJSONArray("mascots");
+		
+		for(int i = 0; i < mascotArr.length(); i++)
+		{
+			JSONObject mascot = mascotArr.getJSONObject(i);
+			
+			if(mascot != null)
+			{
+				int[] ids = new int[0];
+				
+				JSONArray idArr = mascot.getJSONArray("ids");
+				
+				if(idArr != null)
+				{
+					ids = new int[idArr.length()];
+					
+					for(int j = 0; j < idArr.length(); j++)
+					{
+						ids[j] = idArr.getInt(j);
+					}
+				}
+				
+				Mascots.put(mascot.getInt("mascot_id"), new Mascot(mascot.getInt("mascot_id"), mascot.getString("name"), (!mascot.isNull("title") ? mascot.getString("title") : ""), mascot.getInt("gift_id"), ids));
+			}
+		}
+		
+		Logger.info("Loaded " + Mascots.size() + " Mascots!", null);
 	}
 	
 	public static Item getItem(int itemId)

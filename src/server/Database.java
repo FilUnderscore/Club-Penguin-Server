@@ -442,4 +442,9 @@ public class Database
 	{
 		this.Connection.prepareStatement("UPDATE `users` SET coins = '" + coins + "' WHERE id = '" + userId + "';").executeUpdate();
 	}
+
+	public void updateModerationData(int userId, String json) throws Exception
+	{
+		this.Connection.prepareStatement("UPDATE `users` SET moderation = '" + json + "' WHERE id = '" + userId + "';").executeUpdate();
+	}
 }

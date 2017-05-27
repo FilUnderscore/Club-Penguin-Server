@@ -24,6 +24,9 @@ import server.event.events.game.message.SendEmoteEvent;
 import server.event.events.game.message.SendJokeEvent;
 import server.event.events.game.message.SendMessageEvent;
 import server.event.events.game.message.SendSafeMessageEvent;
+import server.event.events.game.moderation.BanEvent;
+import server.event.events.game.moderation.KickEvent;
+import server.event.events.game.moderation.MuteEvent;
 import server.event.events.game.player.GetPlayerEvent;
 import server.event.events.game.player.SendActionEvent;
 import server.event.events.game.player.SendFrameEvent;
@@ -157,5 +160,8 @@ public class Game extends Server
 		this.EventManager.registerEvent(new RemoveBuddyEvent());
 		this.EventManager.registerEvent(new BuddyFindEvent());
 		this.EventManager.registerEvent(new MailStartEvent());
+		this.EventManager.registerEvent(new KickEvent());
+		this.EventManager.registerEvent(new MuteEvent());
+		this.EventManager.registerEvent(new BanEvent());
 	}
 }

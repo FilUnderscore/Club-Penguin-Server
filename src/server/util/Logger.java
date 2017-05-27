@@ -6,7 +6,7 @@ public class Logger
 {
 	public static void log(String info, LogType type, Server server)
 	{
-		System.out.println(Time.getTimestamp() + " [" + type.name() + "] " + "<" + (server != null && server.getServerInfo() != null ? server.getServerInfo().Name : "UNDEFINED") + "> " + info);
+		System.out.println(Time.getTimestamp() + " [" + type.name() + "] " + "<" + (server != null && server.getServerInfo() != null ? server.getServerInfo().Name : "Server") + "> " + info);
 	}
 	
 	public static void info(String msg, Server server)

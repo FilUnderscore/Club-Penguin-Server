@@ -8,9 +8,11 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import server.Server;
+import server.ServerPool;
 import server.ServerType;
 import server.data.Crumbs;
 import server.data.Postcard;
@@ -49,7 +51,8 @@ public class Penguin
 	
 	public StaffRank Ranking;
 	
-	public PunishmentStatus Status;
+	public List<Mute> Mutes;
+	public List<Ban> Bans;
 	
 	/**
 	 * Room (id)
@@ -227,6 +230,8 @@ public class Penguin
 				
 				this.Ranking = StaffRank.valueOf(new JSONObject(data.getString("ranking")).getString("rank"));
 				
+				loadModerationData(this.Id);
+				
 				JSONObject membership = new JSONObject(data.getString("membership"));
 				
 				this.MembershipStatus = membership.getInt("status");
@@ -263,11 +268,89 @@ public class Penguin
 		}
 	}
 	
+	public void loadModerationData(int userId)
+	{
+		try
+		{
+			ResultSet data = this.Server.getDatabase().getUserDetails(userId);
+			
+			if(data.next())
+			{
+				this.Bans = new ArrayList<>();
+				this.Mutes = new ArrayList<>();
+				
+				if(data.getString("moderation").length() > 0)
+				{
+					JSONObject moderation = new JSONObject(data.getString("moderation"));
+					
+					JSONArray muteArr = new JSONArray(moderation.getJSONArray("mutes"));
+					
+					for(int i = 0; i < muteArr.length(); i++)
+					{
+						JSONObject mute = muteArr.getJSONObject(i);
+						
+						this.Mutes.add(new Mute(mute.getString("reason"), mute.getLong("expireTime"), mute.getInt("moderatorID")));
+					}
+					
+					JSONArray banArr = new JSONArray(moderation.getJSONArray("bans"));
+					
+					for(int i = 0; i < banArr.length(); i++)
+					{
+						JSONObject ban = banArr.getJSONObject(i);
+						
+						this.Bans.add(new Ban(ban.getString("reason"), ban.getLong("expireTime"), ban.getInt("moderatorID")));
+					}
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	public void savePenguin()
 	{
 		try
 		{
 			this.Server.getDatabase().updateFriends(this.Friends, this.Id);
+			
+			JSONObject moderation = new JSONObject();
+			
+			JSONArray muteArr = new JSONArray();
+			
+			for(int i = 0; i < this.Mutes.size(); i++)
+			{
+				Mute mute = this.Mutes.get(i);
+				
+				JSONObject muteObj = new JSONObject();
+				
+				muteObj.append("reason", mute.getReason());
+				muteObj.append("expireTime", mute.getExpireTime());
+				muteObj.append("moderatorID", mute.getModeratorId());
+
+				muteArr.put(i, muteObj);
+			}
+			
+			JSONArray banArr = new JSONArray();
+			
+			for(int i = 0; i < this.Bans.size(); i++)
+			{
+				Ban ban = this.Bans.get(i);
+				
+				JSONObject banObj = new JSONObject();
+				
+				banObj.append("reason", ban.getReason());
+				banObj.append("expireTime", ban.getExpireTime());
+				banObj.append("moderatorID", ban.getModeratorId());
+
+				banArr.put(i, banObj);
+			}
+			
+			moderation.append("mutes", muteArr);
+			moderation.append("bans", banArr);
+			
+			this.Server.getDatabase().updateModerationData(this.Id, moderation.toString());
 		}
 		catch(Exception e)
 		{
@@ -348,9 +431,72 @@ public class Penguin
 		this.sendRoom(this.buildXTMessage("sp", roomID, this.Id, x, y));
 	}
 	
+	public Mute getRecentMute()
+	{
+		Mute mute = null;
+		
+		for(Mute m : this.Mutes)
+		{
+			if(!m.hasExpired())
+			{
+				mute = m;
+				break;
+			}
+		}
+		
+		return mute;
+	}
+	
+	public Ban getRecentBan()
+	{
+		Ban ban = null;
+		
+		for(Ban b : this.Bans)
+		{
+			if(!b.hasExpired())
+			{
+				ban = b;
+				break;
+			}
+		}
+		
+		return ban;
+	}
+	
+	public void issueBan(int roomID, int userID, String reason, long length)
+	{
+		Penguin user = ServerPool.getPenguin(userID);
+		
+		if(user != null)
+		{
+			user.Bans.add(new Ban(reason, (length != -1 ? new DateTime().plus(length).getMillis() : -1), this.Id));
+			
+			user.savePenguin();
+			
+			user.sendError(603);
+		}
+	}
+	
+	public void issueMute(int roomID, int userID, String reason, long length)
+	{
+		Penguin user = ServerPool.getPenguin(userID);
+		
+		if(user != null)
+		{
+			user.Mutes.add(new Mute(reason, (length != -1 ? new DateTime().plus(length).getMillis() : -1), this.Id));
+			
+			user.savePenguin();
+		}
+	}
+	
 	public void sendMessage(int roomID, String text)
 	{
 		if(this.Ranking == StaffRank.MODERATOR && this.Server.getCommandManager().runCommand(this, text))
+		{
+			return;
+		}
+		
+		if(this.getRecentMute() != null || text.length() >= 255)
 		{
 			return;
 		}
