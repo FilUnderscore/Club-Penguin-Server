@@ -411,16 +411,15 @@ public class Database
 		
 		while(query.next())
 		{
-			postcards.add(new Postcard(query.getInt("id"), query.getInt("toUser"), query.getInt("fromUser"), query.getInt("mailType"), query.getString("details"), query.getTimestamp("timestamp").getTime(), query.getBoolean("read")));
+			postcards.add(new Postcard(query.getInt("id"), query.getInt("fromUser"), query.getString("fromName"), query.getInt("toUser"), query.getInt("mailType"), query.getString("details"), query.getTimestamp("timestamp").getTime(), query.getBoolean("read")));
 		}
 		
 		return postcards;
 	}
 	
-	public int addPostcard(int receipient, String sender, int senderID, String postcardNotes, int postcardType, int timestamp)
+	public void addPostcard(int receiverID, int senderID, String senderName, int postcardType, String details) throws Exception
 	{
-		//TODO: Implement Mail
-		return 0;
+		this.Connection.prepareStatement("INSERT INTO `mail` (toUser,fromUser,fromName,mailType,details) VALUES ('" + receiverID + "','" + senderID + "','" + senderName + "','" + postcardType + "','" + details + "');").executeUpdate();
 	}
 	
 	public void deletePostcardByReceipient(int postcardId, int receipient)
@@ -433,9 +432,9 @@ public class Database
 		//TODO: Implement Mail
 	}
 	
-	public void updatePostcardRead(int userId)
+	public void updatePostcardRead(int cardType) throws Exception
 	{
-		//TODO: Implement Mail
+		this.Connection.prepareStatement("UPDATE `mail` SET read = '1' WHERE mailType = '" + cardType + "';").executeUpdate();
 	}
 	
 	public void updateCoins(int userId, int coins) throws Exception

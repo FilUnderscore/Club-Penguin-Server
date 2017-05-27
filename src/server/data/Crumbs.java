@@ -17,6 +17,7 @@ public final class Crumbs
 	protected static Map<Integer, Room> Rooms;
 	protected static Map<String, Game> Games;
 	protected static Map<Integer, Mascot> Mascots;
+	protected static Map<String, Map<Integer, Mail>> Postcards;
 	
 	static
 	{
@@ -26,6 +27,7 @@ public final class Crumbs
 			initRooms();
 			initGames();
 			initMascots();
+			initPostcards();
 		}
 		catch(Exception e)
 		{
@@ -135,6 +137,40 @@ public final class Crumbs
 		Logger.info("Loaded " + Mascots.size() + " Mascots!", null);
 	}
 	
+	private static void initPostcards() throws Exception
+	{
+		Postcards = new HashMap<>();
+		
+		int count = 0;
+		
+		JSONObject postcardObj = new JSONObject(new String(Files.readAllBytes(Paths.get("res/postcards.json")), StandardCharsets.UTF_8));
+		
+		for(String key : postcardObj.keySet())
+		{
+			JSONObject postcardobj = postcardObj.getJSONObject(key);
+			
+			Map<Integer, Mail> postcardList = new HashMap<>();
+			
+			for(String k : postcardobj.keySet())
+			{
+				if(k.equalsIgnoreCase("order_position"))
+				{
+					continue;
+				}
+				
+				JSONObject obj = postcardobj.getJSONObject(k);
+				
+				postcardList.put(Integer.parseInt(k), new Mail(obj.getString("subject"), obj.getBoolean("in_catalog")));
+				
+				count++;
+			}
+			
+			Postcards.put(key, postcardList);
+		}
+		
+		Logger.info("Loaded " + count + " Postcards!", null);
+	}
+	
 	public static Item getItem(int itemId)
 	{
 		return Items.get(itemId);
@@ -148,5 +184,17 @@ public final class Crumbs
 	public static Game getGame(String gameName)
 	{
 		return Games.get(gameName);
+	}
+	
+	public static Mail getPostcard(int postcardID)
+	{
+		for(String key : Postcards.keySet())
+		{
+			Map<Integer, Mail> postcard = Postcards.get(key);
+			
+			return postcard.get(postcardID);
+		}
+		
+		return null;
 	}
 }

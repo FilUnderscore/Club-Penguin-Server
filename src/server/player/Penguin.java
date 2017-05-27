@@ -11,6 +11,7 @@ import org.joda.time.Days;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import server.Configuration;
 import server.Server;
 import server.ServerPool;
 import server.ServerType;
@@ -869,12 +870,53 @@ public class Penguin
 				}
 			}
 			
-			this.sendData(this.buildXTMessage("mst", roomID, unreadCount));
+			this.sendData(this.buildXTMessage("mst", roomID, unreadCount, this.Mail.size()));
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public void getMail(int roomID)
+	{
+		String data = fetchMailData();
+		this.sendData(this.buildXTMessage("mg", roomID, data));
+	}
+	
+	public String fetchMailData()
+	{
+		String str = "";
+		
+		try
+		{
+			if(this.Mail == null || this.Mail.size() == 0)
+			{
+				this.Mail = this.Server.getDatabase().getUserPostcards(this.Id);
+			}
+			
+			for(int i = 0; i < this.Mail.size(); i++)
+			{
+				Postcard postcard = this.Mail.get(i);
+				
+				String data = postcard.getFromUserName() + "|" + postcard.getFromUser() + "|" + postcard.getMailType() + "|" + postcard.getDetails() + "|" + postcard.getTimestamp();
+				
+				if(i == 0)
+				{
+					str += data;
+				}
+				else
+				{
+					str += "%" + data;
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return str;
 	}
 	
 	public void kickStop()
@@ -983,5 +1025,48 @@ public class Penguin
 		
 		this.sendData(str);
 		this.sendRoom(str);
+	}
+
+	public void checkPostcard(int roomID) 
+	{
+		try
+		{
+			for(Postcard postcard : this.Mail)
+			{
+				this.Server.getDatabase().updatePostcardRead(postcard.getMailType());
+				this.sendData(this.buildXTMessage("mc", roomID, postcard.getMailType()));
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void sendPostcard(int roomID, int userID, int cardType, String details)
+	{
+		try
+		{
+			if(Crumbs.getPostcard(cardType) == null || userID == this.Id)
+				return;
+			
+			this.deductCoins(Configuration.POSTCARD_SEND_COST);
+			
+			this.sendData(this.buildXTMessage("ms", roomID, this.Coins));
+			
+			this.Server.getDatabase().addPostcard(userID, this.Id, this.Username, cardType, details);
+			
+			Penguin user = Server.getPenguin(userID);
+			
+			if(user != null)
+			{
+				String data = this.Id + "|" + this.Username + "|" + cardType + "|" + details + "|" + System.currentTimeMillis() + "|" + 0; //(unread)
+				user.sendData(this.buildXTMessage("mr", roomID, data));
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

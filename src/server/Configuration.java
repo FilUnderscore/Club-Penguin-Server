@@ -56,6 +56,11 @@ public class Configuration
 	 */
 	public static int GAME_VERSION = 153;
 	
+	/**
+	 * Postcard cost
+	 */
+	public static int POSTCARD_SEND_COST = 10;
+	
 	public Configuration(File file)
 	{
 		
