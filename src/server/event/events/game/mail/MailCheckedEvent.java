@@ -12,6 +12,6 @@ public class MailCheckedEvent extends XTEvent
 
 	public void process(Penguin penguin, String[] args) 
 	{
-		penguin.checkPostcard(Integer.parseInt(args[0]));
+		penguin.checkPostcard(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
 	}
 }

@@ -1,4 +1,4 @@
-package server.player;
+package server.player.moderation;
 
 import org.joda.time.DateTime;
 

@@ -411,7 +411,7 @@ public class Database
 		
 		while(query.next())
 		{
-			postcards.add(new Postcard(query.getInt("id"), query.getInt("fromUser"), query.getString("fromName"), query.getInt("toUser"), query.getInt("mailType"), query.getString("details"), query.getTimestamp("timestamp").getTime(), query.getBoolean("read")));
+			postcards.add(new Postcard(query.getInt("id"), query.getInt("fromUser"), query.getString("fromName"), query.getInt("toUser"), query.getInt("mailType"), query.getString("details"), query.getTimestamp("timestamp").getTime(), query.getBoolean("mailRead")));
 		}
 		
 		return postcards;
@@ -432,9 +432,9 @@ public class Database
 		//TODO: Implement Mail
 	}
 	
-	public void updatePostcardRead(int cardType) throws Exception
+	public void updatePostcardRead(int playerID, int cardType) throws Exception
 	{
-		this.Connection.prepareStatement("UPDATE `mail` SET read = '1' WHERE mailType = '" + cardType + "';").executeUpdate();
+		this.Connection.prepareStatement("UPDATE `mail` SET mailRead = '" + 1 + "' WHERE toUser = '" + playerID + "' AND mailType = '" + cardType + "';").executeUpdate();
 	}
 	
 	public void updateCoins(int userId, int coins) throws Exception

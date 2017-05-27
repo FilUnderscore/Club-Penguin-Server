@@ -18,6 +18,8 @@ import server.ServerType;
 import server.data.Crumbs;
 import server.data.Postcard;
 import server.event.Event;
+import server.player.moderation.Ban;
+import server.player.moderation.Mute;
 import server.util.ListUtil;
 
 public class Penguin 
@@ -1027,15 +1029,12 @@ public class Penguin
 		this.sendRoom(str);
 	}
 
-	public void checkPostcard(int roomID) 
+	public void checkPostcard(int roomID, int card) 
 	{
 		try
 		{
-			for(Postcard postcard : this.Mail)
-			{
-				this.Server.getDatabase().updatePostcardRead(postcard.getMailType());
-				this.sendData(this.buildXTMessage("mc", roomID, postcard.getMailType()));
-			}
+			this.Server.getDatabase().updatePostcardRead(this.Id, card);
+			this.sendData(this.buildXTMessage("mc", roomID, card));
 		}
 		catch(Exception e)
 		{

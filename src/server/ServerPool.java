@@ -1,14 +1,11 @@
 package server;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import server.player.Penguin;
 import server.servers.Game;
 import server.servers.Login;
 import server.servers.Redemption;
-import server.util.ListUtil;
 
 public class ServerPool 
 {
@@ -86,35 +83,19 @@ public class ServerPool
 	{
 		String str = "";
 		
-		Map<Integer, List<Integer>> users = new HashMap<>();
-		
-		for(Penguin client : getPenguins())
-		{
-			int serverID = client.Server.getServerInfo().Id;
-			
-			List<Integer> list = new ArrayList<>();
-			
-			if(users.containsKey(serverID))
-			{
-				list = users.get(serverID);
-			}
-			
-			list.add(client.Id);
-			
-			users.put(serverID, list);
-		}
-		
 		int i = 0;
 		
-		for(int key : users.keySet())
+		for(Server server : getServers())
 		{
+			ServerInfo info = server.getServerInfo();
+			
 			if(i == 0)
 			{
-				str += key + "," + ListUtil.toString(users.get(key));
+				str += info.Id + "," + info.Population;
 			}
 			else
 			{
-				str += "|" + key + "," + ListUtil.toString(users.get(key));
+				str += "|" + info.Id + "," + info.Population;
 			}
 			
 			i++;
