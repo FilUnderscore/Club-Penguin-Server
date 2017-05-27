@@ -58,7 +58,7 @@ public abstract class Server
 			this.ServerInfo.Type = ServerType.LOGIN;
 		}
 		
-		this.Configuration = new Configuration(new File("config.cfg"));
+		this.Configuration = new Configuration(this, new File("config.xml"));
 		
 		this.Threads = Executors.newCachedThreadPool();
 		
@@ -249,6 +249,11 @@ public abstract class Server
 		}
 		
 		return penguins;
+	}
+	
+	public final Configuration getServerConfig()
+	{
+		return this.Configuration;
 	}
 	
 	public final ServerInfo getServerInfo()

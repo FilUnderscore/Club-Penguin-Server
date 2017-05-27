@@ -20,7 +20,7 @@ public class Redemption extends Server
 		Logger.info("Starting Club Penguin [Redemption] Server...", this);
 		Logger.info("Written in Java by Fil_", this);
 	
-		this.ServerSocket = new ServerSocket(this.Configuration.UNLOCKABLE_SERVER_PORT);
+		this.ServerSocket = new ServerSocket(this.Configuration.REDEMPTION_SERVER_PORT);
 		
 		final Server scope = this;
 		

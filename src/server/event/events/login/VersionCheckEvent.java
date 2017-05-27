@@ -2,7 +2,6 @@ package server.event.events.login;
 
 import org.jdom.Element;
 
-import server.Configuration;
 import server.event.ChildEvent;
 import server.event.XMLEvent;
 import server.player.Penguin;
@@ -18,7 +17,7 @@ public class VersionCheckEvent extends ChildEvent
 	{
 		int version = Integer.parseInt(packet.getChild("body").getChild("ver").getAttributeValue("v"));
 		
-		if(version == Configuration.GAME_VERSION)
+		if(version == this.getEvent().getServer().getServerConfig().GAME_VERSION)
 		{
 			penguin.sendData("<msg t='sys'><body action='apiOK' r='0'></body></msg>"); /** Up-to-date SWF Game Version **/
 		}
