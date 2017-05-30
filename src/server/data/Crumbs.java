@@ -192,7 +192,10 @@ public final class Crumbs
 		{
 			Map<Integer, Mail> postcard = Postcards.get(key);
 			
-			return postcard.get(postcardID);
+			if(postcard.containsKey(postcardID))
+			{
+				return postcard.get(postcardID);
+			}
 		}
 		
 		return null;

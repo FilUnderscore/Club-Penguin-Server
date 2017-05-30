@@ -86,7 +86,41 @@ public abstract class Server
 		}
 	}
 	
-	public abstract void init() throws Exception;
+	public void init() throws Exception
+	{
+		this.ServerSocket = new ServerSocket(this.ServerInfo.Port);
+		
+		final Server scope = this;
+		
+		this.ServerThread = new Thread()
+		{
+			public void run()
+			{
+				while(true)
+				{
+					try
+					{
+						//Freezes Thread until a Client has established a Connection!
+						Socket socket = ServerSocket.accept();
+
+						Threads.submit(new Runnable()
+						{
+							public void run()
+							{
+								onConnection(socket);
+							}
+						});
+					}
+					catch(Exception e)
+					{
+						Logger.error("There was an error while accepting a Client connection: " + e.getMessage(), scope);
+					}
+				}
+			}
+		};
+		
+		this.ServerThread.start();
+	}
 	
 	public void onConnection(Socket socket)
 	{

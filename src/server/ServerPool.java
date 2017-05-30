@@ -6,6 +6,7 @@ import server.player.Penguin;
 import server.servers.Game;
 import server.servers.Login;
 import server.servers.Redemption;
+import server.util.Logger;
 
 public class ServerPool 
 {
@@ -31,6 +32,9 @@ public class ServerPool
 		{
 			e.printStackTrace();
 		}
+		
+
+		Logger.info("[ServerPool] " + Servers.size() + " Servers started! Waiting for clients to connect.", null);
 	}
 	
 	public static List<Server> getServers()

@@ -121,11 +121,14 @@ public class Penguin
 	/**
 	 * Age (in days since registration)
 	 */
-	public int Age = 10;
-	public int BannedAge = 4;
+	public int Age;
+	public int BannedAge;
 	
-	public int MinsPlayed = 1000;
+	public int MinsPlayed = 0;
 	
+	/**
+	 * Default Value (1440) to stop timer showing up for permanent.
+	 */
 	public int MembershipDaysLeft = 1440;
 	
 	/**
@@ -263,11 +266,13 @@ public class Penguin
 					}
 					catch(IndexOutOfBoundsException e)
 					{
-						//Ignore
+						//Ignore if indexes don't exist.
 					}
 				}
 				
 				this.Inventory = this.Server.getDatabase().getPenguinInventoryById(this.Id);
+				
+				//TODO: Add Igloos and Furniture
 			}
 		}
 		catch(Exception e)

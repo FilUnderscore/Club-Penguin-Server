@@ -22,15 +22,9 @@ public class ChildEvent
 		}
 	}
 	
-	public void process(Penguin penguin, String[] data)
-	{
-		
-	}
+	public void process(Penguin penguin, String[] data) {}
 	
-	public void process(Penguin penguin, Element packet)
-	{
-		
-	}
+	public void process(Penguin penguin, Element packet) {}
 	
 	public final Event getEvent()
 	{

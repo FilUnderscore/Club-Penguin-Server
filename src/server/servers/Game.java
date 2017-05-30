@@ -1,7 +1,5 @@
 package server.servers;
 
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,30 +11,30 @@ import server.command.commands.StopServerCommand;
 import server.event.events.game.client.HeartbeatEvent;
 import server.event.events.game.client.JoinRoomEvent;
 import server.event.events.game.client.JoinServerEvent;
-import server.event.events.game.friends.BuddyAcceptEvent;
-import server.event.events.game.friends.BuddyFindEvent;
-import server.event.events.game.friends.BuddyRequestEvent;
-import server.event.events.game.friends.GetBuddiesEvent;
-import server.event.events.game.friends.RemoveBuddyEvent;
-import server.event.events.game.inventory.AddItemEvent;
-import server.event.events.game.inventory.GetInventoryEvent;
-import server.event.events.game.mail.MailCheckedEvent;
-import server.event.events.game.mail.MailGetEvent;
-import server.event.events.game.mail.MailSendEvent;
-import server.event.events.game.mail.MailStartEvent;
-import server.event.events.game.message.SendEmoteEvent;
-import server.event.events.game.message.SendJokeEvent;
-import server.event.events.game.message.SendMessageEvent;
-import server.event.events.game.message.SendSafeMessageEvent;
-import server.event.events.game.moderation.BanEvent;
-import server.event.events.game.moderation.KickEvent;
-import server.event.events.game.moderation.MuteEvent;
-import server.event.events.game.player.GetPlayerEvent;
-import server.event.events.game.player.SendActionEvent;
-import server.event.events.game.player.SendFrameEvent;
-import server.event.events.game.player.SetPositionEvent;
-import server.event.events.game.player.SnowballEvent;
-import server.event.events.game.player.UpdatePlayerEvent;
+import server.event.events.game.client.friends.BuddyAcceptEvent;
+import server.event.events.game.client.friends.BuddyFindEvent;
+import server.event.events.game.client.friends.BuddyRequestEvent;
+import server.event.events.game.client.friends.GetBuddiesEvent;
+import server.event.events.game.client.friends.RemoveBuddyEvent;
+import server.event.events.game.client.inventory.AddItemEvent;
+import server.event.events.game.client.inventory.GetInventoryEvent;
+import server.event.events.game.client.mail.MailCheckedEvent;
+import server.event.events.game.client.mail.MailGetEvent;
+import server.event.events.game.client.mail.MailSendEvent;
+import server.event.events.game.client.mail.MailStartEvent;
+import server.event.events.game.client.message.SendEmoteEvent;
+import server.event.events.game.client.message.SendJokeEvent;
+import server.event.events.game.client.message.SendMessageEvent;
+import server.event.events.game.client.message.SendSafeMessageEvent;
+import server.event.events.game.client.moderation.BanEvent;
+import server.event.events.game.client.moderation.KickEvent;
+import server.event.events.game.client.moderation.MuteEvent;
+import server.event.events.game.client.player.GetPlayerEvent;
+import server.event.events.game.client.player.SendActionEvent;
+import server.event.events.game.client.player.SendFrameEvent;
+import server.event.events.game.client.player.SetPositionEvent;
+import server.event.events.game.client.player.SnowballEvent;
+import server.event.events.game.client.player.UpdatePlayerEvent;
 import server.player.Penguin;
 import server.util.Logger;
 
@@ -60,44 +58,8 @@ public class Game extends Server
 
 	public void init() throws Exception
 	{
-		Logger.info("Starting Club Penguin [Game] Server...", this);
-		Logger.info("Written in Java by Fil_", this);
-	
-		this.ServerSocket = new ServerSocket(this.ServerInfo.Port);
+		super.init();
 		
-		final Server scope = this;
-		
-		this.ServerThread = new Thread()
-		{
-			public void run()
-			{
-				Logger.info("Server Started - Waiting for Clients to connect!", scope);
-				
-				while(true)
-				{
-					try
-					{
-						//Freezes Thread until a Client has established a Connection!
-						Socket socket = ServerSocket.accept();
-
-						Threads.submit(new Runnable()
-						{
-							public void run()
-							{
-								onConnection(socket);
-							}
-						});
-					}
-					catch(Exception e)
-					{
-						Logger.error("There was an error while accepting a Client connection: " + e.getMessage(), scope);
-					}
-				}
-			}
-		};
-		
-		this.ServerThread.start();
-	
 		this.Database.updateServer(this.ServerInfo);
 	}
 
