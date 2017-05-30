@@ -21,6 +21,8 @@ public class HeartbeatEvent extends XTEvent
 			penguin.IdleMins = 0;
 		}
 		
+		penguin.MinsPlayed++;
+		
 		penguin.sendData(penguin.buildXTMessage("h", args[0]));
 	}
 }

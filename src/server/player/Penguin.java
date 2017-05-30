@@ -124,6 +124,9 @@ public class Penguin
 	public int Age;
 	public int BannedAge;
 	
+	/**
+	 * If zero, tutorial loads.
+	 */
 	public int MinsPlayed = 0;
 	
 	/**
@@ -239,6 +242,8 @@ public class Penguin
 				
 				this.Age = Days.daysBetween(new DateTime(data.getTimestamp("joindate").getTime()), new DateTime()).getDays();
 				
+				this.MinsPlayed = this.Server.getDatabase().getMinsPlayed(this.Id);
+				
 				this.Ranking = StaffRank.valueOf(new JSONObject(data.getString("ranking")).getString("rank"));
 				
 				loadModerationData(this.Id);
@@ -328,47 +333,54 @@ public class Penguin
 		{
 			this.Server.getDatabase().updateFriends(this.Friends, this.Id);
 			
-			JSONObject moderation = new JSONObject();
+			this.saveModerationData();
 			
-			JSONArray muteArr = new JSONArray();
-			
-			for(int i = 0; i < this.Mutes.size(); i++)
-			{
-				Mute mute = this.Mutes.get(i);
-				
-				JSONObject muteObj = new JSONObject();
-				
-				muteObj.accumulate("reason", mute.getReason());
-				muteObj.accumulate("expireTime", mute.getExpireTime());
-				muteObj.accumulate("moderatorID", mute.getModeratorId());
-
-				muteArr.put(i, muteObj);
-			}
-			
-			JSONArray banArr = new JSONArray();
-			
-			for(int i = 0; i < this.Bans.size(); i++)
-			{
-				Ban ban = this.Bans.get(i);
-				
-				JSONObject banObj = new JSONObject();
-				
-				banObj.accumulate("reason", ban.getReason());
-				banObj.accumulate("expireTime", ban.getExpireTime());
-				banObj.accumulate("moderatorID", ban.getModeratorId());
-
-				banArr.put(i, banObj);
-			}
-			
-			moderation.accumulate("mutes", muteArr);
-			moderation.accumulate("bans", banArr);
-			
-			this.Server.getDatabase().updateModerationData(this.Id, moderation.toString());
+			this.Server.getDatabase().saveMinsPlayed(this.Id, this.MinsPlayed);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	private void saveModerationData() throws Exception
+	{
+		JSONObject moderation = new JSONObject();
+		
+		JSONArray muteArr = new JSONArray();
+		
+		for(int i = 0; i < this.Mutes.size(); i++)
+		{
+			Mute mute = this.Mutes.get(i);
+			
+			JSONObject muteObj = new JSONObject();
+			
+			muteObj.accumulate("reason", mute.getReason());
+			muteObj.accumulate("expireTime", mute.getExpireTime());
+			muteObj.accumulate("moderatorID", mute.getModeratorId());
+
+			muteArr.put(i, muteObj);
+		}
+		
+		JSONArray banArr = new JSONArray();
+		
+		for(int i = 0; i < this.Bans.size(); i++)
+		{
+			Ban ban = this.Bans.get(i);
+			
+			JSONObject banObj = new JSONObject();
+			
+			banObj.accumulate("reason", ban.getReason());
+			banObj.accumulate("expireTime", ban.getExpireTime());
+			banObj.accumulate("moderatorID", ban.getModeratorId());
+
+			banArr.put(i, banObj);
+		}
+		
+		moderation.accumulate("mutes", muteArr);
+		moderation.accumulate("bans", banArr);
+		
+		this.Server.getDatabase().updateModerationData(this.Id, moderation.toString());
 	}
 	
 	public void loadIgloo()

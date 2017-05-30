@@ -340,6 +340,23 @@ public class Database
 		this.Connection.prepareStatement("INSERT INTO `chathistory` (id,text) VALUES ('" + userId + "','" + msg + "');").executeUpdate();
 	}
 	
+	public void saveMinsPlayed(int userId, int minsPlayed) throws Exception
+	{
+		this.Connection.prepareStatement("UPDATE `users` SET minsPlayed = '" + minsPlayed + "' WHERE id = '" + userId + "';").executeUpdate();
+	}
+	
+	public int getMinsPlayed(int userId) throws Exception
+	{
+		ResultSet result = this.Connection.prepareStatement("SELECT * FROM `users` WHERE id = '" + userId + "';").executeQuery();
+		
+		if(result.next())
+		{
+			return result.getInt("minsPlayed");
+		}
+		
+		return -1;
+	}
+	
 	public void updateOnlineStatus(int userId, boolean online) throws Exception
 	{
 		this.Connection.prepareStatement("UPDATE `users` SET online = '" + (online ? "1" : "0") + "' WHERE id = '" + userId + "';").executeUpdate();
