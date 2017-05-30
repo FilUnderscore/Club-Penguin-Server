@@ -23,6 +23,15 @@ public class HeartbeatEvent extends XTEvent
 		
 		penguin.MinsPlayed++;
 		
+		try
+		{
+			this.getServer().getDatabase().saveMinsPlayed(penguin.Id, penguin.MinsPlayed);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
 		penguin.sendData(penguin.buildXTMessage("h", args[0]));
 	}
 }

@@ -33,6 +33,7 @@ public class ServerPool
 			e.printStackTrace();
 		}
 		
+		new Cache();
 
 		Logger.info("[ServerPool] " + Servers.size() + " Servers started! Waiting for clients to connect.", null);
 	}

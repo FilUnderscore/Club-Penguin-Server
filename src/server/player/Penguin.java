@@ -11,6 +11,7 @@ import org.joda.time.Days;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import server.Cache;
 import server.Configuration;
 import server.Server;
 import server.ServerPool;
@@ -204,6 +205,11 @@ public class Penguin
 			return server.getPenguin(userId);
 		}
 		
+		if(Cache.getPenguin(userId) != null)
+		{
+			return Cache.getPenguin(userId);
+		}
+		
 		try
 		{
 			Penguin penguin = new Penguin();
@@ -212,6 +218,8 @@ public class Penguin
 			penguin.Server = server;
 			
 			penguin.loadPenguin();
+			
+			Cache.savePenguin(penguin);
 			
 			return penguin;
 		}
