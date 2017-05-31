@@ -1,5 +1,9 @@
 #Club Penguin Server
-###Created by FilUnderscore
+Created by FilUnderscore
 
-##What can it do?
-###It provides an easy and accessible way to run your own Club Penguin servers without downloading any dependencies, just download, configure and run.
+
+###Functionality
+Club Penguin Server is a java-based command-line server with core dependencies already included within the downloaded file. Optimized for a smooth experience and can host multiple servers per JVM instance, 1 recommended however multiple can be used within different folders.
+
+###API
+To access API features, check out this [wiki](https://bitbucket.org/Fil_/clubpenguinserver/wiki/API) article.
