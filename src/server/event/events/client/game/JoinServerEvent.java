@@ -24,6 +24,15 @@ public class JoinServerEvent extends XTEvent
 		
 		penguin.sendData(penguin.buildXTMessage("lp", args[0], penguin.getClientString(), penguin.Coins, Values.getBool(penguin.SafeMode) + (penguin.SafeMode ? ("%" + penguin.SafeModeEggTimerMins) : ""), penguin.MembershipDaysLeft, (System.currentTimeMillis() / 1000L), penguin.Age, penguin.BannedAge, penguin.MinsPlayed)); //Load Player
 		
-		penguin.joinRoom(100, 330, 330);
+		try
+		{
+			penguin.loadRoomData();
+			
+			penguin.joinRoom(penguin.Room, penguin.X, penguin.Y);
+		}
+		catch(Exception e)
+		{
+			penguin.joinRoom(100, 330, 330);
+		}
 	}
 }

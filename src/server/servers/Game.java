@@ -18,6 +18,7 @@ import server.event.events.client.game.friends.BuddyFindEvent;
 import server.event.events.client.game.friends.BuddyRequestEvent;
 import server.event.events.client.game.friends.GetBuddiesEvent;
 import server.event.events.client.game.friends.RemoveBuddyEvent;
+import server.event.events.client.game.igloo.GetRevisionEvent;
 import server.event.events.client.game.ignore.GetIgnoredEvent;
 import server.event.events.client.game.inventory.AddItemEvent;
 import server.event.events.client.game.inventory.GetInventoryEvent;
@@ -155,5 +156,19 @@ public class Game extends Server
 		this.EventManager.registerEvent(new EPFGetFieldOpEvent());
 		
 		this.EventManager.registerEvent(new GetNinjaRevisionEvent());
+		
+		this.EventManager.registerEvent(new GetRevisionEvent());
+	}
+
+	public String getIglooString()
+	{
+		String str = "";
+		
+		for(Penguin penguin : this.IglooMap)
+		{
+			str += penguin.Id + "|" + penguin.Username + "%";
+		}
+		
+		return str;
 	}
 }

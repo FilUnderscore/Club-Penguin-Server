@@ -19,6 +19,13 @@ public final class Crumbs
 	protected static Map<Integer, Mascot> Mascots;
 	protected static Map<String, Map<Integer, Mail>> Postcards;
 	
+	/**
+	 * Default Room ID
+	 * 
+	 * Town (ID: 100)
+	 */
+	public static int DEFAULT_ROOM_ID = 100;
+	
 	static
 	{
 		try

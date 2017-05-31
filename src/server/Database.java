@@ -10,6 +10,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Hours;
 import org.json.JSONObject;
 
+import server.data.Crumbs;
 import server.data.Postcard;
 import server.util.ListUtil;
 import server.util.Logger;
@@ -465,5 +466,60 @@ public class Database
 	public void updateModerationData(int userId, String json) throws Exception
 	{
 		this.Connection.prepareStatement("UPDATE `users` SET moderation = '" + json + "' WHERE id = '" + userId + "';").executeUpdate();
+	}
+	
+	@SuppressWarnings("serial")
+	public List<Integer> getRoomData(int userId) throws Exception
+	{
+		List<Integer> roomData = new ArrayList<>();
+		
+		int roomId = 0, x = 0, y = 0;
+		
+		ResultSet selfRes = this.Connection.prepareStatement("SELECT * FROM `users` WHERE id = '" + userId + "';").executeQuery();
+		
+		if(selfRes.next())
+		{
+			roomData = ListUtil.toInt(selfRes.getString("roomData"));
+			
+			roomId = roomData.get(0);
+			
+			if(Crumbs.getRoom(roomId) == null)
+			{
+				roomId = Crumbs.DEFAULT_ROOM_ID;
+			}
+			
+			x = roomData.get(1);
+			y = roomData.get(2);
+		}
+		else
+		{
+			roomId = Crumbs.DEFAULT_ROOM_ID;
+			
+			x = 330;
+			y = 330;
+		}
+		
+		final int rID = roomId;
+		final int rX = x;
+		final int rY = y;
+		
+		return new ArrayList<Integer>()
+		{{
+			add(0, rID);
+			add(1, rX);
+			add(2, rY);
+		}};
+	}
+	
+	@SuppressWarnings("serial")
+	public void saveRoomData(int userId, int roomId, int x, int y) throws Exception
+	{
+		this.Connection.prepareStatement("UPDATE `users` SET roomData = '" + ListUtil.toString(new ArrayList<Integer>()
+				{{
+					add(0, roomId);
+					add(1, x);
+					add(2, y);
+				}}
+				) + "' WHERE id = '" + userId + "';").executeUpdate();
 	}
 }

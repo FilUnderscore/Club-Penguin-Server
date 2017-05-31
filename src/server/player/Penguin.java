@@ -275,6 +275,15 @@ public class Penguin
 		}
 	}
 	
+	public void loadRoomData() throws Exception
+	{
+		List<Integer> roomData = this.Server.getDatabase().getRoomData(this.Id);
+		
+		this.Room = roomData.get(0);
+		this.X = roomData.get(1);
+		this.Y = roomData.get(2);
+	}
+	
 	public void loadClothingData() throws Exception
 	{
 		List<Integer> clothes = this.Server.getDatabase().getPenguinClothesById(this.Id);
@@ -443,6 +452,15 @@ public class Penguin
 				this.sendData(buildXTMessage("jr", -1, roomID, this.getClientString() + this.getRoomString()));
 				
 				this.sendRoom(buildXTMessage("ap", -1, this.getClientString()));
+				
+				try
+				{
+					this.Server.getDatabase().saveRoomData(this.Id, roomID, x, y);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 			else
 			{
