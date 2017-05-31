@@ -207,38 +207,12 @@ public abstract class Server
 	
 	public void handleData(byte[] dataArr, Penguin client) throws Exception
 	{
-		String data = new String(dataArr, StandardCharsets.UTF_8);
-		
-		String[] packets = data.split("\0");
-		
-		for(String packet : packets)
+		for(String packet : new String(dataArr, StandardCharsets.UTF_8).split("\0"))
 		{
 			this.EventManager.handleEvents(client, packet);
 		}
 	}
-	
-	public void handleXTData(String packet, Penguin client)
-	{
-		String[] cmds = packet.split("%");
-		
-		String cmd = cmds[3];
-		
-		switch(cmd)
-		{
-		case "j#grs": //Get Room Synchronized
-			break;
-		case "n#gi": //Get Ignore List
-			break;
-		case "f#epfgf": //Get Field-Op (EPF)
-			break;
-		case "ni#gnr": //Get Ninja Revision
-			break;
-		default:
-			//client.sendError(10005);
-			System.out.println("Unhandled Command: " + cmd + "\n\n");
-			break;
-		}
-	}
+
 	public abstract void stop() throws Exception;
 
 	public final void sendData(String data, Penguin client)

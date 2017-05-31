@@ -1,6 +1,6 @@
 package server.data;
 
-public class Game 
+public class Minigame 
 {
 	private String name;
 	private int room_id;
@@ -10,7 +10,7 @@ public class Game
 	private boolean is_as3;
 	private boolean show_player_in_room;
 
-	public Game(String name, int room_id, int music_id, int stamp_group_id, String path, boolean is_as3, boolean show_player_in_room)
+	public Minigame(String name, int room_id, int music_id, int stamp_group_id, String path, boolean is_as3, boolean show_player_in_room)
 	{
 		this.name = name;
 		this.room_id = room_id;

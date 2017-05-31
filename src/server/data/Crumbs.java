@@ -15,7 +15,7 @@ public final class Crumbs
 {
 	protected static Map<Integer, Item> Items;
 	protected static Map<Integer, Room> Rooms;
-	protected static Map<String, Game> Games;
+	protected static Map<String, Minigame> Minigames;
 	protected static Map<Integer, Mascot> Mascots;
 	protected static Map<String, Map<Integer, Mail>> Postcards;
 	
@@ -25,7 +25,7 @@ public final class Crumbs
 		{
 			initItems();
 			initRooms();
-			initGames();
+			initMinigames();
 			initMascots();
 			initPostcards();
 		}
@@ -83,9 +83,9 @@ public final class Crumbs
 		Logger.info("Loaded " + Rooms.size() + " Rooms!", null);
 	}
 	
-	private static void initGames() throws Exception
+	private static void initMinigames() throws Exception
 	{
-		Games = new HashMap<>();
+		Minigames = new HashMap<>();
 		
 		JSONObject gameObj = new JSONObject(new String(Files.readAllBytes(Paths.get("res/games.json")), StandardCharsets.UTF_8));
 		
@@ -95,11 +95,11 @@ public final class Crumbs
 		
 			if(object != null)
 			{
-				Games.put(key, new Game(object.getString("name"), object.getInt("room_id"), object.getInt("music_id"), object.getInt("stamp_group_id"), object.getString("path"), object.getBoolean("is_as3"), object.getBoolean("show_player_in_room")));
+				Minigames.put(key, new Minigame(object.getString("name"), object.getInt("room_id"), object.getInt("music_id"), object.getInt("stamp_group_id"), object.getString("path"), object.getBoolean("is_as3"), object.getBoolean("show_player_in_room")));
 			}
 		}
 		
-		Logger.info("Loaded " + Games.size() + " Games!", null);
+		Logger.info("Loaded " + Minigames.size() + " Minigames!", null);
 	}
 	
 	private static void initMascots() throws Exception
@@ -181,9 +181,9 @@ public final class Crumbs
 		return Rooms.get(roomId);
 	}
 	
-	public static Game getGame(String gameName)
+	public static Minigame getMinigame(String gameName)
 	{
-		return Games.get(gameName);
+		return Minigames.get(gameName);
 	}
 	
 	public static Mail getPostcard(int postcardID)

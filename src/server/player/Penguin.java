@@ -247,6 +247,7 @@ public class Penguin
 				this.Coins = data.getInt("coins");
 				
 				this.Friends = this.Server.getDatabase().getClientFriendIdsById(this.Id);
+				this.Ignored = this.Server.getDatabase().getClientIgnoredIdsById(this.Id);
 				
 				this.Age = Days.daysBetween(new DateTime(data.getTimestamp("joindate").getTime()), new DateTime()).getDays();
 				
@@ -254,34 +255,14 @@ public class Penguin
 				
 				this.Ranking = StaffRank.valueOf(new JSONObject(data.getString("ranking")).getString("rank"));
 				
-				loadModerationData(this.Id);
+				loadModerationData();
 				
 				JSONObject membership = new JSONObject(data.getString("membership"));
 				
 				this.MembershipStatus = membership.getInt("status");
 				this.MembershipDaysLeft = membership.getInt("daysLeft");
 				
-				List<Integer> clothes = this.Server.getDatabase().getPenguinClothesById(this.Id);
-				
-				if(clothes.size() > 0)
-				{
-					try
-					{
-						this.Color = clothes.get(0);
-						this.Head = clothes.get(1);
-						this.Face = clothes.get(2);
-						this.Neck = clothes.get(3);
-						this.Body = clothes.get(4);
-						this.Hands = clothes.get(5);
-						this.Feet = clothes.get(6);
-						this.Flag = clothes.get(7);
-						this.Photo = clothes.get(8);
-					}
-					catch(IndexOutOfBoundsException e)
-					{
-						//Ignore if indexes don't exist.
-					}
-				}
+				loadClothingData();
 				
 				this.Inventory = this.Server.getDatabase().getPenguinInventoryById(this.Id);
 				
@@ -294,44 +275,61 @@ public class Penguin
 		}
 	}
 	
-	public void loadModerationData(int userId)
+	public void loadClothingData() throws Exception
 	{
-		try
+		List<Integer> clothes = this.Server.getDatabase().getPenguinClothesById(this.Id);
+		
+		if(clothes.size() > 0)
 		{
-			ResultSet data = this.Server.getDatabase().getUserDetails(userId);
-			
-			if(data.next())
+			try
 			{
-				this.Bans = new ArrayList<>();
-				this.Mutes = new ArrayList<>();
-				
-				if(data.getString("moderation").length() > 0)
-				{
-					JSONObject moderation = new JSONObject(data.getString("moderation"));
-					
-					JSONArray muteArr = moderation.getJSONArray("mutes");
-					
-					for(int i = 0; i < muteArr.length(); i++)
-					{
-						JSONObject mute = muteArr.getJSONObject(i);
-						
-						this.Mutes.add(new Mute(mute.getString("reason"), mute.getLong("expireTime"), mute.getInt("moderatorID")));
-					}
-					
-					JSONArray banArr = moderation.getJSONArray("bans");
-					
-					for(int i = 0; i < banArr.length(); i++)
-					{
-						JSONObject ban = banArr.getJSONObject(i);
-						
-						this.Bans.add(new Ban(ban.getString("reason"), ban.getLong("expireTime"), ban.getInt("moderatorID")));
-					}
-				}
+				this.Color = clothes.get(0);
+				this.Head = clothes.get(1);
+				this.Face = clothes.get(2);
+				this.Neck = clothes.get(3);
+				this.Body = clothes.get(4);
+				this.Hands = clothes.get(5);
+				this.Feet = clothes.get(6);
+				this.Flag = clothes.get(7);
+				this.Photo = clothes.get(8);
+			}
+			catch(IndexOutOfBoundsException e)
+			{
 			}
 		}
-		catch(Exception e)
+	}
+	
+	public void loadModerationData() throws Exception
+	{
+		ResultSet data = this.Server.getDatabase().getUserDetails(this.Id);
+		
+		if(data.next())
 		{
-			e.printStackTrace();
+			this.Bans = new ArrayList<>();
+			this.Mutes = new ArrayList<>();
+			
+			if(data.getString("moderation").length() > 0)
+			{
+				JSONObject moderation = new JSONObject(data.getString("moderation"));
+				
+				JSONArray muteArr = moderation.getJSONArray("mutes");
+				
+				for(int i = 0; i < muteArr.length(); i++)
+				{
+					JSONObject mute = muteArr.getJSONObject(i);
+					
+					this.Mutes.add(new Mute(mute.getString("reason"), mute.getLong("expireTime"), mute.getInt("moderatorID")));
+				}
+				
+				JSONArray banArr = moderation.getJSONArray("bans");
+				
+				for(int i = 0; i < banArr.length(); i++)
+				{
+					JSONObject ban = banArr.getJSONObject(i);
+					
+					this.Bans.add(new Ban(ban.getString("reason"), ban.getLong("expireTime"), ban.getInt("moderatorID")));
+				}
+			}
 		}
 	}
 	
@@ -340,6 +338,7 @@ public class Penguin
 		try
 		{
 			this.Server.getDatabase().updateFriends(this.Friends, this.Id);
+			this.Server.getDatabase().saveIgnoredList(this.Id, this.Ignored);
 			
 			this.saveModerationData();
 			
@@ -742,6 +741,35 @@ public class Penguin
 	public void removePlayerFromRoom()
 	{
 		this.sendRoom("%xt%rp%-1%" + this.Id + "%");
+	}
+	
+
+	public String getIgnoredString() 
+	{
+		try
+		{
+			String str = "";
+			
+			for(int ignoreId : this.Ignored)
+			{
+				ResultSet res = this.Server.getDatabase().getUserDetails(ignoreId);
+				
+				if(res.next())
+				{
+					String name = res.getString("nickname");
+					
+					str += ignoreId + "|" + name + "%";
+				}
+			}
+			
+			return str;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return "";
 	}
 	
 	public String getBuddyString()

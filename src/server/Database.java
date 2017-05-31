@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joda.time.DateTime;
+import org.joda.time.Hours;
 import org.json.JSONObject;
 
 import server.data.Postcard;
@@ -33,11 +35,11 @@ public class Database
 		
 		if(this.Connection == null)
 		{
-			Logger.warning("Failed to connect to MySQL server.", null);
+			Logger.warning("Failed to connect to MySQL server.", this.Server);
 		}
 		else
 		{
-			Logger.info("Successfully connected to MySQL server.", null);
+			Logger.info("Successfully connected to MySQL server.", this.Server);
 		}
 	}
 	
@@ -58,27 +60,19 @@ public class Database
 		return "";
 	}
 	
-	public String getBannedStatus(String username) throws Exception
-	{
-		ResultSet set = this.Connection.prepareStatement("SELECT * FROM `users` WHERE username = '" + username + "';").executeQuery();
-		
-		if(set.next())
-		{
-			//String moderationStatus = set.getString("moderation");
-			//JSONObject decodedStatus = new JSONObject(moderationStatus);
-			//return decodedStatus.getString("isBanned");
-			return "false";
-		}
-		
-		return "";
-	}
-	
 	public int getInvalidLogins(String username) throws Exception
 	{
 		ResultSet set = this.Connection.prepareStatement("SELECT * FROM `users` WHERE username = '" + username + "';").executeQuery();
 		
 		if(set.next())
 		{
+			if(Hours.hoursBetween(new DateTime(set.getLong("invalidLoginsTimestamp")), new DateTime()).getHours() >= 1)
+			{
+				this.updateInvalidLogins(username, 0);
+				
+				return 0;
+			}
+			
 			return set.getInt("invalidLogins");
 		}
 		
@@ -88,6 +82,8 @@ public class Database
 	public void updateInvalidLogins(String username, int count) throws Exception
 	{
 		this.Connection.prepareStatement("UPDATE `users` SET invalidLogins = '" + count + "' WHERE username = '" + username + "';").executeUpdate();
+	
+		this.Connection.prepareStatement("UPDATE `users` SET invalidLoginsTimestamp = '" + new java.sql.Timestamp(System.currentTimeMillis()).toString() + "' WHERE username = '" + username + "';").executeUpdate();
 	}
 	
 	public void updateLoginKey(String username, String loginKey) throws Exception
@@ -292,6 +288,25 @@ public class Database
 		return friends;
 	}
 	
+	public List<Integer> getClientIgnoredIdsById(int userId) throws Exception
+	{
+		List<Integer> ignored = new ArrayList<>();
+		
+		ResultSet selfRes = this.Connection.prepareStatement("SELECT * FROM `users` WHERE id = '" + userId + "';").executeQuery();
+		
+		if(selfRes.next())
+		{
+			ignored = ListUtil.toInt(selfRes.getString("ignored"));
+		}
+		
+		return ignored;
+	}
+	
+	public void saveIgnoredList(int userId, List<Integer> ignored) throws Exception
+	{
+		this.Connection.prepareStatement("UPDATE `users` SET ignored = '" + ListUtil.toString(ignored) + "' WHERE id = '" + userId + "';").executeUpdate();
+	}
+	
 	public List<Integer> getClientFriendRequestIdsById(int userId) throws Exception
 	{
 		List<Integer> requests = new ArrayList<>();
@@ -406,18 +421,6 @@ public class Database
 		}
 		
 		return str;
-	}
-	
-	public int getUnreadPostcardCount(int userId)
-	{
-		//TODO: Implement Mail
-		return 0;
-	}
-	
-	public int getReceivedPostcardCount(int userId)
-	{
-		//TODO: Implement Mail
-		return 0;
 	}
 	
 	public List<Postcard> getUserPostcards(int userId) throws Exception

@@ -79,7 +79,9 @@ public class LoginEvent extends ChildEvent
 			
 			int clientId = this.getEvent().getServer().getDatabase().getClientIdByUsername(username);
 			
-			penguin.loadModerationData(clientId);
+			penguin.Id = clientId;
+			
+			penguin.loadModerationData();
 			
 			if(penguin.getRecentBan() != null && penguin.getRecentBan().getExpireTime() == -1)
 			{
@@ -149,7 +151,6 @@ public class LoginEvent extends ChildEvent
 			
 			penguin.sendData(penguin.buildXTMessage("l", -1, clientId, loginKey, friends, ServerPool.getWorldPopulationString()));
 			
-			penguin.Id = clientId;
 			penguin.LoginKey = loginKey;
 			
 			if(this.getEvent().getServer().getServerInfo().Type == ServerType.GAME)

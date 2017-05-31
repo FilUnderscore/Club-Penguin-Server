@@ -1,0 +1,14 @@
+Events:
+
+- GetIgnoredEvent
+- GetRoomSynchronizedEvent
+- EPFGetFieldOpEvent
+- GetNinjaRevision
+
+Miscellaneous:
+
+- 'Unlock Items Online' (Redemption) Server.
+
+Games:
+
+- JoinGameEvent
