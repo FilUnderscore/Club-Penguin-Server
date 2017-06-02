@@ -38,8 +38,7 @@ public final class Crumbs
 		}
 		catch(Exception e)
 		{
-			Logger.error("There was an error while trying to load Crumbs: " + e.getMessage(), null);
-			e.printStackTrace();
+			Logger.error("There was an error while trying to load Crumbs: " + e.toString(), null);
 		}
 	}
 	

@@ -2,8 +2,11 @@ package server;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 import server.util.Logger;
@@ -62,14 +65,23 @@ public class Configuration
 		 */
 		public int GAME_VERSION = 153;
 	
-	
-	public Configuration(Server server, File file)
+	private File file;
+		
+	public Configuration()
 	{
-		readConfig(server, file);
+		
+	}
+		
+	public Configuration(File file)
+	{
+		this.file = file;
 	}
 	
-	public void readConfig(Server server, File file)
+	public void readConfig(Server server)
 	{
+		if(this.file == null)
+			return;
+		
 		try
 		{
 			Element element = new SAXBuilder().build(new FileInputStream(file)).getRootElement();
@@ -92,7 +104,15 @@ public class Configuration
 			
 			Logger.info("Loaded Configuration!", server);
 		}
-		catch(Exception e)
+		catch(FileNotFoundException e)
+		{
+			Logger.info("No Server Configuration found. Some features might not work unless manually implemented.", server);
+		}
+		catch(JDOMException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e) 
 		{
 			e.printStackTrace();
 		}

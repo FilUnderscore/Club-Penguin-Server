@@ -33,7 +33,7 @@ public abstract class Server
 	
 	protected List<Penguin> Clients;
 	
-	public Server(ServerInfo info)
+	public Server(ServerInfo info, Configuration config)
 	{
 		this.ServerInfo = info;
 		
@@ -58,7 +58,8 @@ public abstract class Server
 			this.ServerInfo.Type = ServerType.LOGIN;
 		}
 		
-		this.Configuration = new Configuration(this, new File("config.xml"));
+		this.Configuration = config;
+		this.Configuration.readConfig(this);
 		
 		this.Threads = Executors.newCachedThreadPool();
 		
@@ -70,8 +71,7 @@ public abstract class Server
 		}
 		catch(Exception e)
 		{
-			Logger.warning("There was an error while attempting to connect to MySQL database: " + e.getMessage(), this);
-			e.printStackTrace();
+			Logger.warning("There was an error while attempting to connect to MySQL database: " + e.toString(), this);
 		}
 		
 		this.Clients = new ArrayList<>();

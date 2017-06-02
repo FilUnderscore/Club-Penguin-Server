@@ -104,6 +104,19 @@ public final class CPServerAPI
 		return this.pool.getServers();
 	}
 	
+	public final Server getServer(int serverId)
+	{
+		for(Server server : this.getServers())
+		{
+			if(server.getServerInfo().Id == serverId)
+			{
+				return server;
+			}
+		}
+		
+		return null;
+	}
+	
 	/**
 	 * Get API Instance to access with.
 	 * 

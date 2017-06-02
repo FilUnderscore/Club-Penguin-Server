@@ -1,5 +1,8 @@
 package server.servers;
 
+import java.io.File;
+
+import server.Configuration;
 import server.Server;
 import server.ServerInfo;
 import server.player.Penguin;
@@ -9,7 +12,7 @@ public class Login extends Server
 {
 	public Login(ServerInfo info)
 	{
-		super(info);
+		super(info, new Configuration(new File("config.xml")));
 	}
 	
 	public void onDisconnect(Penguin client)

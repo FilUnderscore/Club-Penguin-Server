@@ -1,12 +1,15 @@
 package server.servers;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import server.Configuration;
 import server.Server;
 import server.ServerInfo;
 import server.command.commands.AddInventoryCommand;
 import server.command.commands.BanPlayerCommand;
+import server.command.commands.StopServerCommand;
 import server.command.commands.StopServersCommand;
 import server.event.events.client.game.GetRoomSynchronizedEvent;
 import server.event.events.client.game.HeartbeatEvent;
@@ -49,7 +52,7 @@ public class Game extends Server
 	
 	public Game(ServerInfo info)
 	{
-		super(info);
+		super(info, new Configuration(new File("config.xml")));
 		
 		this.IglooMap = new ArrayList<>();
 		
@@ -104,6 +107,7 @@ public class Game extends Server
 	
 	public void registerCommands()
 	{
+		this.CommandManager.registerCommand(new StopServerCommand());
 		this.CommandManager.registerCommand(new StopServersCommand());
 		this.CommandManager.registerCommand(new AddInventoryCommand());
 		this.CommandManager.registerCommand(new BanPlayerCommand());
