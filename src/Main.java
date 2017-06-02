@@ -1,15 +1,9 @@
-import server.Console;
-import server.ServerPool;
-import server.data.Crumbs;
+import server.api.CPServerAPI;
 
 public class Main 
 {
 	public static void main(String[] args)
 	{
-		new Crumbs();
-		
-		new ServerPool();
-		
-		new Console();
+		CPServerAPI.getAPI().load(true);
 	}
 }

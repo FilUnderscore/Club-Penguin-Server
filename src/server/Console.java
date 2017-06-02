@@ -2,6 +2,8 @@ package server;
 
 import java.util.Scanner;
 
+import server.api.CPServerAPI;
+
 public class Console 
 {
 	private Thread ConsoleThread;
@@ -28,7 +30,17 @@ public class Console
 					{
 						scanner.close();
 						
-						ServerPool.stopServers();
+						for(Server server : CPServerAPI.getAPI().getServers())
+						{
+							try 
+							{
+								server.stop();
+							} 
+							catch (Exception e) 
+							{
+								e.printStackTrace();
+							}
+						}
 						
 						System.exit(0);
 						ConsoleThread.stop();

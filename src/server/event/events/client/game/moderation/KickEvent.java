@@ -1,6 +1,6 @@
 package server.event.events.client.game.moderation;
 
-import server.ServerPool;
+import server.api.CPServerAPI;
 import server.event.XTEvent;
 import server.player.Penguin;
 import server.player.StaffRank;
@@ -19,7 +19,7 @@ public class KickEvent extends XTEvent
 			return;
 		}
 		
-		Penguin user = ServerPool.getPenguin(Integer.parseInt(args[1]));
+		Penguin user = CPServerAPI.getAPI().getPenguin(Integer.parseInt(args[1]));
 	
 		if(user != null)
 		{

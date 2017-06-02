@@ -9,8 +9,8 @@ import org.jdom.Element;
 import org.joda.time.DateTime;
 import org.joda.time.Hours;
 
-import server.ServerPool;
 import server.ServerType;
+import server.api.CPServerAPI;
 import server.event.ChildEvent;
 import server.event.XMLEvent;
 import server.player.Penguin;
@@ -110,7 +110,7 @@ public class LoginEvent extends ChildEvent
 					for(int i = 0; i < friendData.size(); i++)
 					{
 						int friendID = friendData.get(i);
-						Penguin friend = ServerPool.getPenguin(friendID);
+						Penguin friend = CPServerAPI.getAPI().getPenguin(friendID);
 						
 						if(friend != null)
 						{
@@ -149,7 +149,7 @@ public class LoginEvent extends ChildEvent
 				e.printStackTrace();
 			}
 			
-			penguin.sendData(penguin.buildXTMessage("l", -1, clientId, loginKey, friends, ServerPool.getWorldPopulationString()));
+			penguin.sendData(penguin.buildXTMessage("l", -1, clientId, loginKey, friends, CPServerAPI.getAPI().getServerPopulationString()));
 			
 			penguin.LoginKey = loginKey;
 			

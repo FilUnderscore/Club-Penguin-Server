@@ -7,7 +7,7 @@ import server.Server;
 import server.ServerInfo;
 import server.command.commands.AddInventoryCommand;
 import server.command.commands.BanPlayerCommand;
-import server.command.commands.StopServerCommand;
+import server.command.commands.StopServersCommand;
 import server.event.events.client.game.GetRoomSynchronizedEvent;
 import server.event.events.client.game.HeartbeatEvent;
 import server.event.events.client.game.JoinRoomEvent;
@@ -104,7 +104,7 @@ public class Game extends Server
 	
 	public void registerCommands()
 	{
-		this.CommandManager.registerCommand(new StopServerCommand());
+		this.CommandManager.registerCommand(new StopServersCommand());
 		this.CommandManager.registerCommand(new AddInventoryCommand());
 		this.CommandManager.registerCommand(new BanPlayerCommand());
 	}

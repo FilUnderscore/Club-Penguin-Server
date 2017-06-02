@@ -1,7 +1,6 @@
 package server.command.commands;
 
 import server.Server;
-import server.ServerPool;
 import server.command.Command;
 import server.player.Penguin;
 import server.player.StaffRank;
@@ -15,8 +14,13 @@ public class StopServerCommand extends Command
 
 	public void execute(Server server, Penguin client, String[] args) 
 	{
-		ServerPool.stopServers();
-		
-		System.exit(0);
+		try
+		{
+			server.stop();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

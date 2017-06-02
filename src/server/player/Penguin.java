@@ -14,8 +14,8 @@ import org.json.JSONObject;
 import server.Cache;
 import server.Configuration;
 import server.Server;
-import server.ServerPool;
 import server.ServerType;
+import server.api.CPServerAPI;
 import server.data.Crumbs;
 import server.data.Postcard;
 import server.event.Event;
@@ -195,9 +195,9 @@ public class Penguin
 	
 	public static Penguin loadPenguin(int userId, Server server)
 	{
-		if(server == null && ServerPool.getPenguin(userId) != null)
+		if(server == null && CPServerAPI.getAPI().getPenguin(userId) != null)
 		{
-			return ServerPool.getPenguin(userId);
+			return CPServerAPI.getAPI().getPenguin(userId);
 		}
 		
 		if(server.getPenguin(userId) != null)
@@ -515,7 +515,7 @@ public class Penguin
 	
 	public void issueBan(int roomID, int userID, String reason, long length)
 	{
-		Penguin user = ServerPool.getPenguin(userID);
+		Penguin user = CPServerAPI.getAPI().getPenguin(userID);
 		
 		if(user != null)
 		{
@@ -535,7 +535,7 @@ public class Penguin
 	
 	public void issueMute(int roomID, int userID, String reason, long length)
 	{
-		Penguin user = ServerPool.getPenguin(userID);
+		Penguin user = CPServerAPI.getAPI().getPenguin(userID);
 		
 		if(user != null)
 		{

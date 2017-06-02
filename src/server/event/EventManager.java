@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import server.Server;
+import server.api.CPServerAPI;
 import server.event.events.client.login.ActionEvent;
 import server.event.events.client.login.PolicyFileRequestEvent;
 import server.player.Penguin;
@@ -25,6 +26,11 @@ public class EventManager
 	{
 		this.registerEvent(new PolicyFileRequestEvent());
 		this.registerEvent(new ActionEvent());
+		
+		for(Event event : CPServerAPI.getAPI().getEvents())
+		{
+			this.registerEvent(event);
+		}
 	}
 	
 	public void init()

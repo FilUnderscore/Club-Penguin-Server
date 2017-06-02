@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import server.Server;
+import server.api.CPServerAPI;
 import server.player.Penguin;
 import server.util.Logger;
 
@@ -22,8 +23,18 @@ public class CommandManager
 		this.Commands = new HashMap<>();
 	}
 	
+	private void registerAPICommands()
+	{
+		for(Command command : CPServerAPI.getAPI().getCommands())
+		{
+			this.registerCommand(command);
+		}
+	}
+	
 	public void init()
 	{
+		registerAPICommands();
+		
 		Logger.info("{CommandManager} Loaded " + this.Commands.size() + " Commands!", this.server);
 	}
 	

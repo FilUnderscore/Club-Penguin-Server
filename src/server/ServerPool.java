@@ -12,38 +12,46 @@ public class ServerPool
 {
 	protected static List<Server> Servers;
 	
-	static
+	public ServerPool(boolean loadFromDB)
 	{
 		Servers = new ArrayList<>();
 		
-		Server login = new Login(new ServerInfo(1, "Login", "127.0.0.1", 6112));
-		
-		Servers.add(login);
-		Servers.add(new Redemption(new ServerInfo(2, "Redemption", "127.0.0.1", 6114)));
-		
-		try
+		if(loadFromDB)
 		{
-			for(ServerInfo server : login.getDatabase().getServerList())
+			Server login = new Login(new ServerInfo(1, "Login", "127.0.0.1", 6112));
+			
+			Servers.add(login);
+			Servers.add(new Redemption(new ServerInfo(2, "Redemption", "127.0.0.1", 6114)));
+			
+			try
 			{
-				Servers.add(new Game(server));
+				for(ServerInfo server : login.getDatabase().getServerList())
+				{
+					Servers.add(new Game(server));
+				}
 			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		
-		new Cache();
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			
+			new Cache();
 
-		Logger.info("[ServerPool] " + Servers.size() + " Servers started! Waiting for clients to connect.", null);
+			Logger.info("[ServerPool] " + Servers.size() + " Servers started! Waiting for clients to connect.", null);
+		}
 	}
 	
-	public static List<Server> getServers()
+	public void registerServer(Server server)
+	{
+		Servers.add(server);
+	}
+	
+	public List<Server> getServers()
 	{
 		return Servers;
 	}
 	
-	public static Server getServer(int serverId)
+	public Server getServer(int serverId)
 	{
 		for(Server server : Servers)
 		{
@@ -56,7 +64,7 @@ public class ServerPool
 		return null;
 	}
 	
-	public static Penguin getPenguin(int userId)
+	public Penguin getPenguin(int userId)
 	{
 		for(Penguin penguin : getPenguins())
 		{
@@ -69,7 +77,7 @@ public class ServerPool
 		return null;
 	}
 	
-	public static List<Penguin> getPenguins()
+	public List<Penguin> getPenguins()
 	{
 		List<Penguin> penguins = new ArrayList<>();
 		
@@ -84,7 +92,7 @@ public class ServerPool
 		return penguins;
 	}
 	
-	public static String getWorldPopulationString()
+	public String getWorldPopulationString()
 	{
 		String str = "";
 		
@@ -109,9 +117,9 @@ public class ServerPool
 		return str;
 	}
 	
-	public static void stopServers()
+	public void stopServers()
 	{
-		for(Server server : ServerPool.getServers())
+		for(Server server : getServers())
 		{
 			try
 			{
