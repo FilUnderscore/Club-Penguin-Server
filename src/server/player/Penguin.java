@@ -790,6 +790,14 @@ public class Penguin
 		return "";
 	}
 	
+	public void ignorePlayer(int roomID, int playerID)
+	{
+		if(!this.Ignored.contains(playerID))
+		{
+			this.Ignored.add(playerID);
+		}
+	}
+	
 	public String getBuddyString()
 	{
 		try

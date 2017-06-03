@@ -12,6 +12,6 @@ public class AddIgnoredEvent extends XTEvent
 
 	public void process(Penguin penguin, String[] args) 
 	{
-		
+		penguin.ignorePlayer(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
 	}
 }
