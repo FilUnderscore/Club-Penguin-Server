@@ -20,7 +20,6 @@ public class Logger
 			timestamp = timestamp.replaceAll(":", "-");
 			
 			File = Paths.get("logs/" + timestamp + ".log").toFile();
-			System.out.println(File.getAbsolutePath());
 			
 			if(!Paths.get("logs/").toFile().exists())
 			{

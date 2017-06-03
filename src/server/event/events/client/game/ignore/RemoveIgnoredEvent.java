@@ -3,15 +3,15 @@ package server.event.events.client.game.ignore;
 import server.event.XTEvent;
 import server.player.Penguin;
 
-public class AddIgnoredEvent extends XTEvent
+public class RemoveIgnoredEvent extends XTEvent
 {
-	public AddIgnoredEvent() 
+	public RemoveIgnoredEvent() 
 	{
-		super("n#an");
+		super("n#rn");
 	}
 
 	public void process(Penguin penguin, String[] args) 
 	{
-		penguin.ignorePlayer(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+		penguin.unignorePlayer(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
 	}
 }

@@ -796,6 +796,18 @@ public class Penguin
 		{
 			this.Ignored.add(playerID);
 		}
+		
+		this.sendData(this.buildXTMessage("an", roomID, playerID));
+	}
+	
+	public void unignorePlayer(int roomID, int playerID)
+	{
+		if(this.Ignored.contains(playerID))
+		{
+			this.Ignored.remove(playerID);
+		}
+		
+		this.sendData(this.buildXTMessage("rn", roomID, playerID));
 	}
 	
 	public String getBuddyString()

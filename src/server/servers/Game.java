@@ -22,7 +22,9 @@ import server.event.events.client.game.friends.BuddyRequestEvent;
 import server.event.events.client.game.friends.GetBuddiesEvent;
 import server.event.events.client.game.friends.RemoveBuddyEvent;
 import server.event.events.client.game.igloo.GetRevisionEvent;
+import server.event.events.client.game.ignore.AddIgnoredEvent;
 import server.event.events.client.game.ignore.GetIgnoredEvent;
+import server.event.events.client.game.ignore.RemoveIgnoredEvent;
 import server.event.events.client.game.inventory.AddItemEvent;
 import server.event.events.client.game.inventory.GetInventoryEvent;
 import server.event.events.client.game.mail.MailCheckedEvent;
@@ -156,6 +158,8 @@ public class Game extends Server
 		this.EventManager.registerEvent(new GetRoomSynchronizedEvent());
 		
 		this.EventManager.registerEvent(new GetIgnoredEvent());
+		this.EventManager.registerEvent(new AddIgnoredEvent());
+		this.EventManager.registerEvent(new RemoveIgnoredEvent());
 		
 		this.EventManager.registerEvent(new EPFGetFieldOpEvent());
 		
