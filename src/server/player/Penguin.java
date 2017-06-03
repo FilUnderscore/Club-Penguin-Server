@@ -178,7 +178,10 @@ public class Penguin
 		{
 			if(client.getRoom() == this.Room && client.Id != this.Id)
 			{
-				client.sendData(data);
+				if(!client.Ignored.contains(this))
+				{
+					client.sendData(data);
+				}
 			}
 		}
 	}
@@ -797,6 +800,8 @@ public class Penguin
 			this.Ignored.add(playerID);
 		}
 		
+		savePenguin();
+		
 		this.sendData(this.buildXTMessage("an", roomID, playerID));
 	}
 	
@@ -806,6 +811,8 @@ public class Penguin
 		{
 			this.Ignored.remove(playerID);
 		}
+		
+		savePenguin();
 		
 		this.sendData(this.buildXTMessage("rn", roomID, playerID));
 	}
