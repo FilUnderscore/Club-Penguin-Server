@@ -5,6 +5,9 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -13,6 +16,7 @@ import org.json.JSONObject;
 
 import server.Cache;
 import server.Configuration;
+import server.Filter;
 import server.Server;
 import server.ServerType;
 import server.api.CPServerAPI;
@@ -22,6 +26,7 @@ import server.event.Event;
 import server.player.moderation.Ban;
 import server.player.moderation.Mute;
 import server.util.ListUtil;
+import server.util.Values;
 
 public class Penguin 
 {
@@ -562,6 +567,11 @@ public class Penguin
 		}
 		
 		if(this.getRecentMute() != null || text.length() >= 255)
+		{
+			return;
+		}
+		
+		if(Filter.isInitialized() && Filter.contains(text.toLowerCase()))
 		{
 			return;
 		}
@@ -1185,5 +1195,32 @@ public class Penguin
 		{
 			e.printStackTrace();
 		}
+	}
+
+	public void handleCoinsDug(int roomID)
+	{
+		int coins = new Random().nextInt(29) + 1;
+		
+		this.buildXTMessage("cdu", this.Room, coins, this.Coins);
+	}
+
+	public void checkPuffleName(int roomID, String name)
+	{
+		boolean appropriate = false;
+		
+		Pattern pattern = Pattern.compile("[^A-Za-z0-9]");
+		Matcher m = pattern.matcher(name);
+		
+		if(m.matches())
+		{
+			appropriate = true;
+		}
+		
+		if(Filter.isInitialized() && Filter.contains(name.toLowerCase()))
+		{
+			appropriate = false;
+		}
+		
+		this.sendData(this.buildXTMessage("checkpufflename", roomID, name, Values.getBool(appropriate)));
 	}
 }

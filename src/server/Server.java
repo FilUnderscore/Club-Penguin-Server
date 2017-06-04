@@ -1,6 +1,5 @@
 package server;
 
-import java.io.File;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -19,7 +18,9 @@ import server.util.Logger;
 public abstract class Server 
 {
 	protected ServerInfo ServerInfo;
+	
 	protected Configuration Configuration;
+	protected Filter Filter;
 	
 	protected Database Database;
 	
@@ -34,6 +35,11 @@ public abstract class Server
 	protected List<Penguin> Clients;
 	
 	public Server(ServerInfo info, Configuration config)
+	{
+		this(info, config, null);
+	}
+	
+	public Server(ServerInfo info, Configuration config, Filter filter)
 	{
 		this.ServerInfo = info;
 		
@@ -60,6 +66,8 @@ public abstract class Server
 		
 		this.Configuration = config;
 		this.Configuration.readConfig(this);
+		
+		this.Filter = filter;
 		
 		this.Threads = Executors.newCachedThreadPool();
 		

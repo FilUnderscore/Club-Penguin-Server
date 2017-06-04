@@ -1,10 +1,12 @@
 package server.api;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import server.Console;
+import server.Filter;
 import server.Server;
 import server.ServerPool;
 import server.command.Command;
@@ -23,9 +25,22 @@ public final class CPServerAPI
 	private List<Event> events = new ArrayList<>();
 	private List<Command> commands = new ArrayList<>();
 	
+	public final void load()
+	{
+		this.load(false);
+	}
+	
 	public final void load(boolean loadFromDB)
 	{
+		this.load(loadFromDB, null);
+	}
+	
+	public final void load(boolean loadFromDB, File filterFile)
+	{
 		this.crumbs = new Crumbs();
+		
+		if(filterFile != null)
+			Filter.initializeFilter(filterFile);
 		
 		if(loadFromDB)
 			this.pool = new ServerPool(loadFromDB);

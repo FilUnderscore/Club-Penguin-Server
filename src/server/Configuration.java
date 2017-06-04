@@ -9,6 +9,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
+import server.util.FileUtil;
 import server.util.Logger;
 
 public class Configuration
@@ -21,22 +22,22 @@ public class Configuration
 		/**
 		 * MySQL Server Host
 		 */
-		public String SQL_HOST;
+		public String SQL_HOST = "127.0.0.1";
 		
 		/**
 		 * MySQL Server Username
 		 */
-		public String SQL_USER;
+		public String SQL_USER = "root";
 		
 		/**
 		 * MySQL Server Password
 		 */
-		public String SQL_PASS;
+		public String SQL_PASS = "";
 		
 		/**
 		 * MySQL Database Name
 		 */
-		public String SQL_DB;
+		public String SQL_DB = "";
 	
 		
 	/***
@@ -106,7 +107,12 @@ public class Configuration
 		}
 		catch(FileNotFoundException e)
 		{
-			Logger.info("No Server Configuration found. Some features might not work unless manually implemented.", server);
+			Logger.warning("No Server Configuration found, creating file. Some features might not work unless manually implemented until configuration is setup.", server);
+			
+			FileUtil.writeToFile(this.file, "<config>", "<database>", "<hostname>", this.SQL_HOST, "</hostname>", "<username>", 
+					this.SQL_USER, "</username>", "<password>", this.SQL_PASS, "</password>", "<dbName>", this.SQL_DB, "</dbName>", "</database>", "<ports>",
+					"<login>", this.LOGIN_SERVER_PORT, "</login>", "<redemption>", this.REDEMPTION_SERVER_PORT, "</redemption>", "</ports>", "<game>", "<version>",
+					this.GAME_VERSION, "</version>", "</game>", "</config>");
 		}
 		catch(JDOMException e)
 		{
