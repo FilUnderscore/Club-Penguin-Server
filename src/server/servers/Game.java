@@ -33,8 +33,12 @@ import server.event.events.client.game.mail.MailSendEvent;
 import server.event.events.client.game.mail.MailStartEvent;
 import server.event.events.client.game.message.SendEmoteEvent;
 import server.event.events.client.game.message.SendJokeEvent;
+import server.event.events.client.game.message.SendLineMessageEvent;
+import server.event.events.client.game.message.SendMascotMessageEvent;
 import server.event.events.client.game.message.SendMessageEvent;
+import server.event.events.client.game.message.SendQuickMessageEvent;
 import server.event.events.client.game.message.SendSafeMessageEvent;
+import server.event.events.client.game.message.SendTourMessageEvent;
 import server.event.events.client.game.moderation.BanEvent;
 import server.event.events.client.game.moderation.KickEvent;
 import server.event.events.client.game.moderation.MuteEvent;
@@ -139,6 +143,10 @@ public class Game extends Server
 		this.EventManager.registerEvent(new SendJokeEvent());
 		this.EventManager.registerEvent(new SendSafeMessageEvent());
 		this.EventManager.registerEvent(new SendEmoteEvent());
+		this.EventManager.registerEvent(new SendMascotMessageEvent());
+		this.EventManager.registerEvent(new SendTourMessageEvent());
+		this.EventManager.registerEvent(new SendQuickMessageEvent());
+		this.EventManager.registerEvent(new SendLineMessageEvent());
 		
 		this.EventManager.registerEvent(new GetBuddiesEvent());
 		this.EventManager.registerEvent(new BuddyRequestEvent());

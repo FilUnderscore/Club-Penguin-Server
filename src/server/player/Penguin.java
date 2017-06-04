@@ -595,6 +595,26 @@ public class Penguin
 		this.sendRoom(this.buildXTMessage("ss", roomID, this.Id, safeMsgID));
 	}
 	
+	public void sendMascotMessage(int roomID, int mascotMsgID)
+	{
+		this.sendRoom(this.buildXTMessage("sma", roomID, this.Id, mascotMsgID));
+	}
+	
+	public void sendTourMessage(int roomID, int tourMsgID)
+	{
+		this.sendRoom(this.buildXTMessage("st", roomID, this.Id, tourMsgID));
+	}
+	
+	public void sendLineMessage(int roomID, int lineMsgID)
+	{
+		this.sendRoom(this.buildXTMessage("sl", roomID, this.Id, lineMsgID));
+	}
+	
+	public void sendQuickMessage(int roomID, int quickMsgID)
+	{
+		this.sendRoom(this.buildXTMessage("sq", roomID, this.Id, quickMsgID));
+	}
+	
 	public String buildXTMessage(String type, Object...args)
 	{
 		String str = "%xt%" + type + "%";
