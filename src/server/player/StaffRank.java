@@ -2,6 +2,8 @@ package server.player;
 
 public enum StaffRank 
 {
-	PLAYER,
-	MODERATOR
+	SYSTEM,
+	ADMIN,
+	MODERATOR,
+	PLAYER;
 }

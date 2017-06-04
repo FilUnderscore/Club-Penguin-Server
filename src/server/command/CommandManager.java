@@ -66,10 +66,16 @@ public class CommandManager
 		cmd = cmd.substring(1);
 		String shortenedCmd = cmd.split(" ")[0];
 		
-		if(this.commandExists(shortenedCmd) && client.Ranking == this.Commands.get(shortenedCmd).getRank())
+		if(this.commandExists(shortenedCmd))
 		{
+			if(client != null && client.Ranking.ordinal() > this.Commands.get(shortenedCmd).getRank().ordinal())
+			{
+				return false;
+			}
+			
+			Logger.info("Player [" + client.Id + "] '" + client.Username + "' executed command '" + cmd + "'", this.server);
+			
 			this.Commands.get(shortenedCmd).execute(this.server, client, cmd.split(" "));
-			Logger.info("cmd: " + shortenedCmd + " args: " + cmd.split(" ")[0], null);
 			
 			return true;
 		}

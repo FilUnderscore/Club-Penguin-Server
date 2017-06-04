@@ -201,6 +201,27 @@ public class Penguin
 		this.sendData(this.buildXTMessage("e", -1, error));
 	}
 	
+	public static Penguin createPenguin(int userId, String name, Server server)
+	{
+		if(Cache.getPenguin(userId) != null)
+		{
+			Cache.getPenguin(userId).Server = server;
+
+			return Cache.getPenguin(userId);
+		}
+		
+		Penguin penguin = new Penguin();
+		
+		penguin.Id = userId;
+		penguin.Username = name;
+		penguin.Ranking = StaffRank.SYSTEM;
+		penguin.Server = server;
+		
+		Cache.savePenguin(penguin);
+		
+		return penguin;
+	}
+	
 	public static Penguin loadPenguin(int userId, Server server)
 	{
 		if(server == null && CPServerAPI.getAPI().getPenguin(userId) != null)

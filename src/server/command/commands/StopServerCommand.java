@@ -9,7 +9,7 @@ public class StopServerCommand extends Command
 {
 	public StopServerCommand() 
 	{
-		super("stopserver", StaffRank.MODERATOR);
+		super("stopserver", StaffRank.ADMIN);
 	}
 
 	public void execute(Server server, Penguin client, String[] args) 

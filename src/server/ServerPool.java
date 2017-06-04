@@ -18,10 +18,10 @@ public class ServerPool
 		
 		if(loadFromDB)
 		{
-			Server login = new Login(new ServerInfo(1, "Login", "127.0.0.1", 6112));
+			Server login = new Login(new ServerInfo(-1, "Login", "127.0.0.1", 6112));
 			
 			Servers.add(login);
-			Servers.add(new Redemption(new ServerInfo(2, "Redemption", "127.0.0.1", 6114)));
+			Servers.add(new Redemption(new ServerInfo(-2, "Redemption", "127.0.0.1", 6114)));
 			
 			try
 			{
