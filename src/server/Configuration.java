@@ -68,11 +68,13 @@ public class Configuration
 	
 	private File file;
 		
-	public Configuration()
+	public static Configuration DEFAULT_CONFIGURATION = new Configuration();
+	
+	private Configuration()
 	{
 		
 	}
-		
+	
 	public Configuration(File file)
 	{
 		this.file = file;

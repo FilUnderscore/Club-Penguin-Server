@@ -1,1 +1,1 @@
-<config><database><hostname>127.0.0.1</hostname><username>root</username><password></password><dbName></dbName></database><ports><login>6112</login><redemption>6114</redemption></ports><game><version>153</version></game></config>
+<config><database><hostname>127.0.0.1</hostname><username>root</username><password></password><dbName>clubpenguin</dbName></database><ports><login>6112</login><redemption>6114</redemption></ports><game><version>153</version></game></config>
