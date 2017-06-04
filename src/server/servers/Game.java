@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import server.Configuration;
-import server.Filter;
 import server.Server;
 import server.ServerInfo;
 import server.command.commands.AddInventoryCommand;
@@ -51,6 +50,7 @@ import server.event.events.client.game.player.SendFrameEvent;
 import server.event.events.client.game.player.SetPositionEvent;
 import server.event.events.client.game.player.SnowballEvent;
 import server.event.events.client.game.player.UpdatePlayerEvent;
+import server.event.events.client.game.puffle.CheckPuffleNameEvent;
 import server.player.Penguin;
 import server.util.Logger;
 
@@ -123,25 +123,50 @@ public class Game extends Server
 
 	public void registerEvents() 
 	{
+		/**
+		 * Join Server
+		 */
 		this.EventManager.registerEvent(new JoinServerEvent());
 		
+		/**
+		 * Get Inventory
+		 */
 		this.EventManager.registerEvent(new GetInventoryEvent());
 		
+		/**
+		 * Room
+		 */
 		this.EventManager.registerEvent(new JoinRoomEvent());
 		this.EventManager.registerEvent(new SetPositionEvent());
+		this.EventManager.registerEvent(new GetRoomSynchronizedEvent());
 		
+		/**
+		 * Client
+		 */
 		this.EventManager.registerEvent(new HeartbeatEvent());
 		
+		/**
+		 * Player
+		 */
 		this.EventManager.registerEvent(new UpdatePlayerEvent());
 		this.EventManager.registerEvent(new GetPlayerEvent());
 		
+		/**
+		 * Inventory
+		 */
 		this.EventManager.registerEvent(new AddItemEvent());
 		this.EventManager.registerEvent(new CoinsDigUpdateEvent());
 		
+		/**
+		 * Actions
+		 */
 		this.EventManager.registerEvent(new SnowballEvent());
 		this.EventManager.registerEvent(new SendFrameEvent());
 		this.EventManager.registerEvent(new SendActionEvent());
 		
+		/**
+		 * Messages
+		 */
 		this.EventManager.registerEvent(new SendMessageEvent());
 		this.EventManager.registerEvent(new SendJokeEvent());
 		this.EventManager.registerEvent(new SendSafeMessageEvent());
@@ -151,32 +176,56 @@ public class Game extends Server
 		this.EventManager.registerEvent(new SendQuickMessageEvent());
 		this.EventManager.registerEvent(new SendLineMessageEvent());
 		
+		/**
+		 * Buddies (Friends)
+		 */
 		this.EventManager.registerEvent(new GetBuddiesEvent());
 		this.EventManager.registerEvent(new BuddyRequestEvent());
 		this.EventManager.registerEvent(new BuddyAcceptEvent());
 		this.EventManager.registerEvent(new RemoveBuddyEvent());
 		this.EventManager.registerEvent(new BuddyFindEvent());
 		
+		/**
+		 * Mail
+		 */
 		this.EventManager.registerEvent(new MailStartEvent());
 		this.EventManager.registerEvent(new MailGetEvent());
 		this.EventManager.registerEvent(new MailCheckedEvent());
 		this.EventManager.registerEvent(new MailSendEvent());
 		
+		/**
+		 * Moderation
+		 */
 		this.EventManager.registerEvent(new KickEvent());
 		this.EventManager.registerEvent(new MuteEvent());
 		this.EventManager.registerEvent(new BanEvent());
 		
-		this.EventManager.registerEvent(new GetRoomSynchronizedEvent());
-		
+		/**
+		 * Ignore
+		 */
 		this.EventManager.registerEvent(new GetIgnoredEvent());
 		this.EventManager.registerEvent(new AddIgnoredEvent());
 		this.EventManager.registerEvent(new RemoveIgnoredEvent());
 		
+		/**
+		 * EPF
+		 */
 		this.EventManager.registerEvent(new EPFGetFieldOpEvent());
 		
+		/**
+		 * Ninja
+		 */
 		this.EventManager.registerEvent(new GetNinjaRevisionEvent());
 		
+		/**
+		 * Miscellaneous
+		 */
 		this.EventManager.registerEvent(new GetRevisionEvent());
+		
+		/**
+		 * Puffle
+		 */
+		this.EventManager.registerEvent(new CheckPuffleNameEvent());
 	}
 
 	public String getIglooString()

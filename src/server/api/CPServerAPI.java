@@ -18,9 +18,7 @@ public final class CPServerAPI
 {
 	private static CPServerAPI INSTANCE;
 	
-	private Crumbs crumbs;
 	private ServerPool pool;
-	private Console console;
 	
 	private List<Event> events = new ArrayList<>();
 	private List<Command> commands = new ArrayList<>();
@@ -37,7 +35,7 @@ public final class CPServerAPI
 	
 	public final void load(boolean loadFromDB, File filterFile)
 	{
-		this.crumbs = new Crumbs();
+		new Crumbs();
 		
 		if(filterFile != null)
 			Filter.initializeFilter(filterFile);
@@ -49,7 +47,7 @@ public final class CPServerAPI
 			this.pool = new ServerPool(loadFromDB);
 		}
 		
-		this.console = new Console();
+		new Console();
 	}
 	
 	public final void registerServer(Server server)
