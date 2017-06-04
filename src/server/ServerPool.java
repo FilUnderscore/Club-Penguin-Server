@@ -32,7 +32,14 @@ public class ServerPool
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
+				if(e instanceof NullPointerException)
+				{
+					Logger.info("Failed to retrieve ServerList information.", null);
+				}
+				else
+				{
+					e.printStackTrace();
+				}
 			}
 			
 			new Cache();

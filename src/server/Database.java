@@ -67,7 +67,7 @@ public class Database
 		
 		if(set.next())
 		{
-			if(Hours.hoursBetween(new DateTime(set.getLong("invalidLoginsTimestamp")), new DateTime()).getHours() >= 1)
+			if(Hours.hoursBetween(new DateTime(set.getTimestamp("invalidLoginsTimestamp").getTime()), new DateTime()).getHours() >= 1)
 			{
 				this.updateInvalidLogins(username, 0);
 				

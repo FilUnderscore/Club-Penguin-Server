@@ -196,9 +196,9 @@ public class Penguin
 		return this.Room;
 	}
 	
-	public void sendError(int i)
+	public void sendError(int error)
 	{
-		sendData("%xt%e%-1%" + i + "%");
+		this.sendData(this.buildXTMessage("e", -1, error));
 	}
 	
 	public static Penguin loadPenguin(int userId, Server server)
