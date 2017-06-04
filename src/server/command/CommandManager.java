@@ -7,6 +7,7 @@ import server.Server;
 import server.api.CPServerAPI;
 import server.player.Penguin;
 import server.util.Logger;
+import server.util.StringUtil;
 
 public class CommandManager 
 {
@@ -75,7 +76,9 @@ public class CommandManager
 			
 			Logger.info("Player [" + client.Id + "] '" + client.Username + "' executed command '" + cmd + "'", this.server);
 			
-			this.Commands.get(shortenedCmd).execute(this.server, client, cmd.split(" "));
+			String args = StringUtil.getArguments(1, cmd.split(" ").length - 1, cmd.split(" "));
+			
+			this.Commands.get(shortenedCmd).execute(this.server, client, args.split(" "));
 			
 			return true;
 		}

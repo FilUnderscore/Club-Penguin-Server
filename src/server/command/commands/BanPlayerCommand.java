@@ -4,6 +4,7 @@ import server.Server;
 import server.command.Command;
 import server.player.Penguin;
 import server.player.StaffRank;
+import server.util.StringUtil;
 
 public class BanPlayerCommand extends Command
 {
@@ -14,13 +15,15 @@ public class BanPlayerCommand extends Command
 
 	public void execute(Server server, Penguin client, String[] args) 
 	{
-		StringBuilder reason = new StringBuilder();
-		
-		for(int i = 2; i < args.length; i++)
+		try
 		{
-			reason.append(args[i] + " ");
+			String reason = StringUtil.getArguments(2, args.length, args);
+			
+			client.issueBan(-1, Integer.parseInt(args[0]), reason, Integer.parseInt(args[1]));
 		}
-		
-		client.issueBan(-1, Integer.parseInt(args[0]), reason.toString(), Integer.parseInt(args[1]));
+		catch(ArrayIndexOutOfBoundsException e)
+		{
+			client.issueBan(-1, Integer.parseInt(args[0]), "", -1);
+		}
 	}
 }

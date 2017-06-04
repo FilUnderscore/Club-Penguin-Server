@@ -8,7 +8,7 @@ public class StringUtil
 		
 		for(int i = index; i < length; i++)
 		{
-			sb.append(text[index] + " ");
+			sb.append(text[i] + " ");
 		}
 		
 		return sb.toString();

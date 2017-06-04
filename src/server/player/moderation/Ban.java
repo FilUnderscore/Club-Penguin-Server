@@ -32,7 +32,7 @@ public class Ban
 	
 	public boolean hasExpired()
 	{
-		return new DateTime().isAfter(expireTime);
+		return expireTime != -1 && new DateTime().isAfter(expireTime);
 	}
 	
 	public void setExpired(boolean b)

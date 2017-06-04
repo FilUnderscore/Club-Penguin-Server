@@ -350,22 +350,28 @@ public class Penguin
 			{
 				JSONObject moderation = new JSONObject(data.getString("moderation"));
 				
-				JSONArray muteArr = moderation.getJSONArray("mutes");
-				
-				for(int i = 0; i < muteArr.length(); i++)
-				{
-					JSONObject mute = muteArr.getJSONObject(i);
-					
-					this.Mutes.add(new Mute(mute.getString("reason"), mute.getLong("expireTime"), mute.getInt("moderatorID")));
-				}
-				
 				JSONArray banArr = moderation.getJSONArray("bans");
 				
-				for(int i = 0; i < banArr.length(); i++)
+				if(banArr.length() >= 1)
 				{
-					JSONObject ban = banArr.getJSONObject(i);
-					
-					this.Bans.add(new Ban(ban.getString("reason"), ban.getLong("expireTime"), ban.getInt("moderatorID")));
+					for(int i = 0; i < banArr.length(); i++)
+					{
+						JSONObject ban = banArr.getJSONObject(i);
+						
+						this.Bans.add(new Ban(ban.getString("reason"), ban.getLong("expireTime"), ban.getInt("moderatorID")));
+					}
+				}
+				
+				JSONArray muteArr = moderation.getJSONArray("mutes");
+				
+				if(muteArr.length() >= 1)
+				{
+					for(int i = 0; i < muteArr.length(); i++)
+					{
+						JSONObject mute = muteArr.getJSONObject(i);
+						
+						this.Mutes.add(new Mute(mute.getString("reason"), mute.getLong("expireTime"), mute.getInt("moderatorID")));
+					}
 				}
 			}
 		}
@@ -422,8 +428,8 @@ public class Penguin
 			banArr.put(i, banObj);
 		}
 		
-		moderation.accumulate("mutes", muteArr);
-		moderation.accumulate("bans", banArr);
+		moderation.put("mutes", (Object)muteArr);
+		moderation.put("bans", (Object)banArr);
 		
 		this.Server.getDatabase().updateModerationData(this.Id, moderation.toString());
 	}
@@ -1243,5 +1249,15 @@ public class Penguin
 		}
 		
 		this.sendData(this.buildXTMessage("checkpufflename", roomID, name, Values.getBool(appropriate)));
+	}
+
+	public void issueKick(int userID)
+	{
+		Penguin user = CPServerAPI.getAPI().getPenguin(userID);
+		
+		if(user != null)
+		{
+			user.sendError(610);
+		}
 	}
 }
