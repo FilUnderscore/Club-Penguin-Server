@@ -12,6 +12,6 @@ public class EPFGetFieldOpEvent extends XTEvent
 
 	public void process(Penguin penguin, String[] args) 
 	{
-		
+		penguin.sendData(penguin.buildXTMessage("epfgf", Integer.parseInt(args[0]), penguin.FieldOpStatus));
 	}
 }

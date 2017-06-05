@@ -16,12 +16,14 @@ import org.json.JSONObject;
 
 import server.Cache;
 import server.Configuration;
+import server.ElitePenguinForce;
 import server.Filter;
 import server.Server;
 import server.ServerType;
 import server.api.CPServerAPI;
 import server.data.Crumbs;
 import server.data.Postcard;
+import server.epf.EPFMessage;
 import server.event.Event;
 import server.player.moderation.Ban;
 import server.player.moderation.Mute;
@@ -57,6 +59,7 @@ public class Penguin
 	public int MembershipStatus;
 	
 	public boolean IsEPF;
+	public boolean FieldOpStatus;
 	
 	public StaffRank Ranking;
 	
@@ -473,7 +476,11 @@ public class Penguin
 	{
 		removePlayerFromRoom();
 		
-		this.Frame = 0;
+		if(roomID >= 900)
+		{
+			this.buildXTMessage("jg", -1, roomID);
+			return;
+		}
 		
 		if(Crumbs.getRoom(roomID) != null)
 		{
@@ -1258,6 +1265,44 @@ public class Penguin
 		if(user != null)
 		{
 			user.sendError(610);
+		}
+	}
+
+	public void updateFieldOpStatus(int roomID) 
+	{
+		this.FieldOpStatus = !this.FieldOpStatus;
+		
+		//TODO: Save to Database (epf/agent)
+		
+		this.sendData(this.buildXTMessage("epfsf", roomID, Values.getBool(this.FieldOpStatus)));
+	}
+
+	public void sendEPFMessageList(int roomID)
+	{
+		if(ElitePenguinForce.isInitialized())
+		{
+			if(ElitePenguinForce.getEPFMessages().size() <= 0)
+			{
+				return;
+			}
+			
+			StringBuilder sb = new StringBuilder();
+			
+			EPFMessage firstMessage = ElitePenguinForce.getEPFMessages().get(0);
+			
+			sb.append(firstMessage.getText() + "|" + firstMessage.getTimestamp() + "|" + firstMessage.getMascotID());
+			
+			if(ElitePenguinForce.getEPFMessages().size() > 1)
+			{
+				for(int i = 1; i < ElitePenguinForce.getEPFMessages().size(); i++)
+				{
+					EPFMessage message = ElitePenguinForce.getEPFMessages().get(i);
+					
+					sb.append("%" + message.getText() + "|" + message.getTimestamp() + "%" + message.getMascotID());
+				}
+			}
+			
+			this.sendData(this.buildXTMessage("epfgm", roomID, this.Id, sb.toString()));
 		}
 	}
 }

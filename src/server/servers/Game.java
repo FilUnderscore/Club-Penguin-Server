@@ -15,7 +15,11 @@ import server.event.events.client.game.GetRoomSynchronizedEvent;
 import server.event.events.client.game.HeartbeatEvent;
 import server.event.events.client.game.JoinRoomEvent;
 import server.event.events.client.game.JoinServerEvent;
+import server.event.events.client.game.epf.EPFGetAgentEvent;
 import server.event.events.client.game.epf.EPFGetFieldOpEvent;
+import server.event.events.client.game.epf.EPFGetMessageEvent;
+import server.event.events.client.game.epf.EPFSetAgentEvent;
+import server.event.events.client.game.epf.EPFSetFieldOpEvent;
 import server.event.events.client.game.friends.BuddyAcceptEvent;
 import server.event.events.client.game.friends.BuddyFindEvent;
 import server.event.events.client.game.friends.BuddyRequestEvent;
@@ -211,6 +215,10 @@ public class Game extends Server
 		 * EPF
 		 */
 		this.EventManager.registerEvent(new EPFGetFieldOpEvent());
+		this.EventManager.registerEvent(new EPFSetFieldOpEvent());
+		this.EventManager.registerEvent(new EPFGetAgentEvent());
+		this.EventManager.registerEvent(new EPFSetAgentEvent());
+		this.EventManager.registerEvent(new EPFGetMessageEvent());
 		
 		/**
 		 * Ninja

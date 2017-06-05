@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import server.Console;
+import server.ElitePenguinForce;
 import server.Filter;
 import server.Server;
 import server.ServerPool;
@@ -35,10 +36,18 @@ public final class CPServerAPI
 	
 	public final void load(boolean loadFromDB, File filterFile)
 	{
+		this.load(loadFromDB, filterFile, null);
+	}
+	
+	public final void load(boolean loadFromDB, File filterFile, File epfFile)
+	{
 		new Crumbs();
 		
 		if(filterFile != null)
 			Filter.initializeFilter(filterFile);
+		
+		if(epfFile != null)
+			ElitePenguinForce.initializeEPF(epfFile);
 		
 		if(loadFromDB)
 			this.pool = new ServerPool(loadFromDB);

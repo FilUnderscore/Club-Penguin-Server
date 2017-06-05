@@ -33,7 +33,7 @@ public final class Filter
 				FilteredWords.add(child.getName());
 			}
 			
-			Logger.info("Filter initialized!", null);
+			Logger.info("Loaded " + FilteredWords.size() + " Filter Words!", null);
 		}
 		catch(FileNotFoundException e)
 		{
