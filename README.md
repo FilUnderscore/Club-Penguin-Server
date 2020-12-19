@@ -1,3 +1,5 @@
+# ARCHIVED AS FLASH IS BEING DISCONTINUED AS OF DECEMBER 2020
+
 # Club Penguin Server
 Created by FilUnderscore
 
